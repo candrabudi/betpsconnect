@@ -3,6 +3,7 @@ package resident
 import (
 	"betpsconnect/internal/dto"
 	"betpsconnect/internal/factory"
+	"betpsconnect/internal/model"
 	"betpsconnect/internal/repository"
 	"context"
 )
@@ -13,6 +14,7 @@ type service struct {
 
 type Service interface {
 	GetListResident(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultResident, error)
+	Store(ctx context.Context, payload dto.PayloadStoreResident) error
 	GetListResidentGroup(ctx context.Context) ([]dto.KecamatanInKabupaten, error)
 }
 
@@ -49,4 +51,25 @@ func (s *service) GetListResidentGroup(ctx context.Context) ([]dto.KecamatanInKa
 	}
 
 	return listResidentGroup, nil
+}
+
+func (s *service) Store(ctx context.Context, payload dto.PayloadStoreResident) error {
+	dataStore := model.Resident{
+		Nama:          payload.Nama,
+		Alamat:        payload.Alamat,
+		JenisKelamin:  payload.JenisKelamin,
+		NamaKabupaten: payload.NamaKabupaten,
+		NamaKecamatan: payload.NamaKecamatan,
+		NamaKelurahan: payload.NamaKelurahan,
+		Nik:           payload.Nik,
+		Rt:            payload.Rt,
+		Rw:            payload.Rw,
+		Usia:          payload.Usia,
+		Telp:          payload.Telp,
+		Tps:           payload.Tps,
+	}
+	if err := s.residentRepository.Store(ctx, dataStore); err != nil {
+		return err
+	}
+	return nil
 }

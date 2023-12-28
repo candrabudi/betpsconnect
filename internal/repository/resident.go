@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -16,6 +17,7 @@ import (
 
 type Resident interface {
 	GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultResident, error)
+	Store(ctx context.Context, data model.Resident) error
 	GetKecamatanByKabupaten(ctx context.Context, kabupatenName string) ([]dto.FindAllResidentGrouped, error)
 }
 
@@ -34,7 +36,6 @@ func (r *resident) GetAll(ctx context.Context, limit, offset int64, filter dto.R
 	collectionName := "residents"
 
 	collection := r.MongoConn.Database(dbName).Collection(collectionName)
-
 	bsonFilter := bson.M{}
 	if filter.NamaKabupaten != "" {
 		bsonFilter["nama_kabupaten"] = filter.NamaKabupaten
@@ -66,11 +67,51 @@ func (r *resident) GetAll(ctx context.Context, limit, offset int64, filter dto.R
 	defer cursor.Close(ctx)
 
 	var dataAllResident []dto.FindAllResident
+	// for cursor.Next(ctx) {
+	// 	var dresident model.Resident
+	// 	if err := cursor.Decode(&dresident); err != nil {
+	// 		return dto.ResultResident{}, err
+	// 	}
+	// 	serverDTO := dto.FindAllResident{
+	// 		ID:             dresident.ID,
+	// 		Nama:           dresident.Nama,
+	// 		Alamat:         dresident.Alamat,
+	// 		JenisKelamin:   dresident.JenisKelamin,
+	// 		Kawin:          dresident.Kawin,
+	// 		NamaKabupaten:  dresident.NamaKabupaten,
+	// 		NamaKecamatan:  dresident.NamaKecamatan,
+	// 		NamaKelurahan:  dresident.NamaKelurahan,
+	// 		Nik:            dresident.Nik,
+	// 		Nkk:            dresident.Nkk,
+	// 		NoKtp:          dresident.NoKtp,
+	// 		Rt:             dresident.Rt,
+	// 		Rw:             dresident.Rw,
+	// 		Status:         dresident.Status,
+	// 		StatusTpsLabel: dresident.StatusTpsLabel,
+	// 		Tps:            dresident.Tps,
+	// 	}
+
+	// 	dataAllResident = append(dataAllResident, serverDTO)
+	// }
+
 	for cursor.Next(ctx) {
 		var dresident model.Resident
 		if err := cursor.Decode(&dresident); err != nil {
 			return dto.ResultResident{}, err
 		}
+		age := dresident.Usia
+		if age == 0 {
+			dob, err := time.Parse("2006-01-02", dresident.TanggalLahir)
+			if err != nil {
+				fmt.Println(err)
+			}
+			now := time.Now()
+			age = now.Year() - dob.Year()
+			if now.YearDay() < dob.YearDay() {
+				age--
+			}
+		}
+
 		serverDTO := dto.FindAllResident{
 			ID:             dresident.ID,
 			Nama:           dresident.Nama,
@@ -88,6 +129,7 @@ func (r *resident) GetAll(ctx context.Context, limit, offset int64, filter dto.R
 			Status:         dresident.Status,
 			StatusTpsLabel: dresident.StatusTpsLabel,
 			Tps:            dresident.Tps,
+			Usia:           age,
 		}
 
 		dataAllResident = append(dataAllResident, serverDTO)
@@ -110,6 +152,19 @@ func (r *resident) GetAll(ctx context.Context, limit, offset int64, filter dto.R
 	}
 
 	return result, nil
+}
+
+func (r *resident) Store(ctx context.Context, data model.Resident) error {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "residents"
+
+	collection := r.MongoConn.Database(dbName).Collection(collectionName)
+
+	_, err := collection.InsertOne(ctx, data)
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *resident) GetKecamatanByKabupaten(ctx context.Context, kabupatenName string) ([]dto.FindAllResidentGrouped, error) {
