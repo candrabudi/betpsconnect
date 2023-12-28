@@ -153,8 +153,9 @@ func (r *resident) GetKecamatanByKabupaten(ctx context.Context, kabupatenName st
 		bson.M{
 			"$group": bson.M{
 				"_id": bson.M{
-					"nama_kecamatan": "$nama_kecamatan",
 					"nama_kabupaten": "$nama_kabupaten",
+					"nama_kecamatan": "$nama_kecamatan",
+					"nama_kelurahan": "$nama_kelurahan",
 				},
 				"count": bson.M{"$sum": 1}, // Jika ingin menghitung jumlah data
 			},
@@ -177,6 +178,7 @@ func (r *resident) GetKecamatanByKabupaten(ctx context.Context, kabupatenName st
 		groupedData := dto.FindAllResidentGrouped{
 			NamaKecamatan: result["_id"].(bson.M)["nama_kecamatan"].(string),
 			NamaKabupaten: result["_id"].(bson.M)["nama_kabupaten"].(string),
+			NamaKelurahan: result["_id"].(bson.M)["nama_kelurahan"].(string),
 			Count:         result["count"].(int32), // Jika menghitung jumlah data
 		}
 

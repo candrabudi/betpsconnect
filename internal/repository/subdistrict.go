@@ -8,10 +8,14 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type SubDistrict interface {
 	GetByDistrict(ctx context.Context, filter dto.GetByDistrict) ([]dto.GetByDistrict, error)
+	FindOne(ctx context.Context, filter dto.GetByDistrict) (dto.GetByDistrict, error)
+	Store(ctx context.Context, data model.SubDistrict) error
+	FindLastOne(ctx context.Context) (dto.GetByDistrict, error)
 }
 
 type subdistrict struct {
@@ -62,4 +66,70 @@ func (s *subdistrict) GetByDistrict(ctx context.Context, filter dto.GetByDistric
 	}
 
 	return dataDistrictByCity, nil
+}
+
+func (s *subdistrict) FindOne(ctx context.Context, filter dto.GetByDistrict) (dto.GetByDistrict, error) {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "subdistricts"
+
+	collection := s.MongoConn.Database(dbName).Collection(collectionName)
+	bsonFilter := bson.M{}
+	if filter.NamaKecamatan != "" {
+		bsonFilter["nama_kabupaten"] = filter.NamaKabupaten
+	}
+	if filter.NamaKecamatan != "" {
+		bsonFilter["nama_kecamatan"] = filter.NamaKecamatan
+	}
+	if filter.NamaKelurahan != "" {
+		bsonFilter["nama_kelurahan"] = filter.NamaKelurahan
+	}
+	var dresident model.Resident
+	err := collection.FindOne(ctx, bsonFilter).Decode(&dresident)
+	if err != nil {
+		return dto.GetByDistrict{}, err
+	}
+
+	districtDTO := dto.GetByDistrict{
+		ID:            dresident.ID,
+		NamaKecamatan: dresident.NamaKecamatan,
+		NamaKelurahan: dresident.NamaKelurahan,
+	}
+
+	return districtDTO, nil
+}
+
+func (s *subdistrict) Store(ctx context.Context, data model.SubDistrict) error {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "subdistricts"
+
+	collection := s.MongoConn.Database(dbName).Collection(collectionName)
+
+	_, err := collection.InsertOne(ctx, data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *subdistrict) FindLastOne(ctx context.Context) (dto.GetByDistrict, error) {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "subdistricts"
+
+	collection := s.MongoConn.Database(dbName).Collection(collectionName)
+	opts := options.FindOne()
+	opts.SetSort(bson.D{{"_id", -1}}) // Mengurutkan berdasarkan field "_id" secara descending (dari besar ke kecil)
+	var dresident model.Resident
+	err := collection.FindOne(ctx, bson.M{}, opts).Decode(&dresident)
+	if err != nil {
+		return dto.GetByDistrict{}, err
+	}
+
+	districtDTO := dto.GetByDistrict{
+		ID:            dresident.ID,
+		NamaKecamatan: dresident.NamaKecamatan,
+		NamaKelurahan: dresident.NamaKelurahan,
+		// Tambahkan field lain yang perlu di-decode dari dokumen
+	}
+
+	return districtDTO, nil
 }

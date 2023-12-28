@@ -89,12 +89,14 @@ type (
 	FindAllResidentGrouped struct {
 		NamaKecamatan string `json:"nama_kecamatan"`
 		NamaKabupaten string `json:"nama_kabupaten"`
+		NamaKelurahan string `json:"nama_kelurahan"`
 		Count         int32  `json:"count"`
 	}
 
 	KecamatanInKabupaten struct {
 		NamaKecamatan string `json:"nama_kecamatan"`
 		NamaKabupaten string `json:"nama_kabupaten"`
+		NamaKelurahan string `json:"nama_kelurahan"`
 		Count         int32  `json:"count"`
 	}
 )

@@ -6,21 +6,27 @@ import (
 	"betpsconnect/internal/model"
 	"betpsconnect/internal/repository"
 	"context"
+
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type service struct {
-	residentRepository repository.Resident
+	residentRepository    repository.Resident
+	subdistrictRepository repository.SubDistrict
+	districtRepository    repository.District
 }
 
 type Service interface {
 	GetListResident(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultResident, error)
 	Store(ctx context.Context, payload dto.PayloadStoreResident) error
-	GetListResidentGroup(ctx context.Context) ([]dto.KecamatanInKabupaten, error)
+	GetListResidentGroup(ctx context.Context) error
 }
 
 func NewService(f *factory.Factory) Service {
 	return &service{
-		residentRepository: f.ResidentRepository,
+		residentRepository:    f.ResidentRepository,
+		subdistrictRepository: f.SubDistrictRepository,
+		districtRepository:    f.DistrictRepository,
 	}
 }
 
@@ -33,24 +39,37 @@ func (s *service) GetListResident(ctx context.Context, limit, offset int64, filt
 	return resultResident, nil
 }
 
-func (s *service) GetListResidentGroup(ctx context.Context) ([]dto.KecamatanInKabupaten, error) {
-	var listResidentGroup []dto.KecamatanInKabupaten
+func (s *service) GetListResidentGroup(ctx context.Context) error {
 
-	residents, err := s.residentRepository.GetKecamatanByKabupaten(ctx, "CIANJUR")
+	results, err := s.residentRepository.GetKecamatanByKabupaten(ctx, "BOGOR")
 	if err != nil {
-		return nil, err
+		return err
 	}
 
-	for _, resident := range residents {
-		residentDTO := dto.KecamatanInKabupaten{
-			NamaKecamatan: resident.NamaKecamatan,
-			NamaKabupaten: resident.NamaKabupaten,
-			Count:         resident.Count,
+	for _, data := range results {
+		filter := dto.GetByCity{
+			NamaKabupaten: data.NamaKabupaten,
+			NamaKecamatan: data.NamaKecamatan,
 		}
-		listResidentGroup = append(listResidentGroup, residentDTO)
+		_, err := s.districtRepository.FindOne(ctx, filter)
+		if err == mongo.ErrNoDocuments {
+			result, _ := s.districtRepository.FindLastOne(ctx)
+
+			SubDistrictId := result.ID + 1
+			dataStore := model.District{
+				ID:            SubDistrictId,
+				NamaKabupaten: data.NamaKabupaten,
+				NamaKecamatan: data.NamaKecamatan,
+			}
+			if err := s.districtRepository.Store(ctx, dataStore); err != nil {
+				return err
+			}
+		} else if err != nil {
+			return err
+		}
 	}
 
-	return listResidentGroup, nil
+	return nil
 }
 
 func (s *service) Store(ctx context.Context, payload dto.PayloadStoreResident) error {

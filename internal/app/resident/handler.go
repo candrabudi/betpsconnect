@@ -60,14 +60,14 @@ func (h *handler) GetResidents(c *gin.Context) {
 func (h *handler) GetGroupBy(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	data, err := h.service.GetListResidentGroup(ctx)
+	err := h.service.GetListResidentGroup(ctx)
 	if err != nil {
 		response := util.APIResponse("Failed to retrieve resident list: "+err.Error(), http.StatusInternalServerError, "failed", nil)
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := util.APIResponse("Success get list of residents", http.StatusOK, "success", data)
+	response := util.APIResponse("Success get list of residents", http.StatusOK, "success", nil)
 	c.JSON(http.StatusOK, response)
 }
 
