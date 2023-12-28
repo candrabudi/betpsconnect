@@ -54,7 +54,8 @@ func (r *resident) GetAll(ctx context.Context, limit, offset int64, filter dto.R
 		bsonFilter["nama"] = regex
 	}
 
-	totalResults, err := collection.CountDocuments(ctx, bsonFilter)
+	// Menggunakan EstimatedDocumentCount untuk menghitung total data
+	totalResults, err := collection.EstimatedDocumentCount(ctx)
 	if err != nil {
 		return dto.ResultResident{}, err
 	}
@@ -123,7 +124,6 @@ func (r *resident) GetAll(ctx context.Context, limit, offset int64, filter dto.R
 			Count:        count,
 		},
 	}
-
 	return result, nil
 }
 
