@@ -67,33 +67,6 @@ func (r *resident) GetAll(ctx context.Context, limit, offset int64, filter dto.R
 	defer cursor.Close(ctx)
 
 	var dataAllResident []dto.FindAllResident
-	// for cursor.Next(ctx) {
-	// 	var dresident model.Resident
-	// 	if err := cursor.Decode(&dresident); err != nil {
-	// 		return dto.ResultResident{}, err
-	// 	}
-	// 	serverDTO := dto.FindAllResident{
-	// 		ID:             dresident.ID,
-	// 		Nama:           dresident.Nama,
-	// 		Alamat:         dresident.Alamat,
-	// 		JenisKelamin:   dresident.JenisKelamin,
-	// 		Kawin:          dresident.Kawin,
-	// 		NamaKabupaten:  dresident.NamaKabupaten,
-	// 		NamaKecamatan:  dresident.NamaKecamatan,
-	// 		NamaKelurahan:  dresident.NamaKelurahan,
-	// 		Nik:            dresident.Nik,
-	// 		Nkk:            dresident.Nkk,
-	// 		NoKtp:          dresident.NoKtp,
-	// 		Rt:             dresident.Rt,
-	// 		Rw:             dresident.Rw,
-	// 		Status:         dresident.Status,
-	// 		StatusTpsLabel: dresident.StatusTpsLabel,
-	// 		Tps:            dresident.Tps,
-	// 	}
-
-	// 	dataAllResident = append(dataAllResident, serverDTO)
-	// }
-
 	for cursor.Next(ctx) {
 		var dresident model.Resident
 		if err := cursor.Decode(&dresident); err != nil {

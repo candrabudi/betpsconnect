@@ -7,11 +7,12 @@ import (
 
 type Factory struct {
 	ResidentRepository repository.Resident
+	DistrictRepository repository.District
 }
 
 func NewFactory() *Factory {
 	mongoConn := database.GetMongoConnection()
 	return &Factory{
-		ResidentRepository: repository.NewResidentRepository(mongoConn),
+		DistrictRepository: repository.NewDistrictRepository(mongoConn),
 	}
 }
