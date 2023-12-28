@@ -72,8 +72,22 @@ func (r *resident) GetAll(ctx context.Context, limit, offset int64, filter dto.R
 			return dto.ResultResident{}, err
 		}
 		serverDTO := dto.FindAllResident{
-			ID:   dresident.ID,
-			Nama: dresident.Nama,
+			ID:             dresident.ID,
+			Nama:           dresident.Nama,
+			Alamat:         dresident.Alamat,
+			JenisKelamin:   dresident.JenisKelamin,
+			Kawin:          dresident.Kawin,
+			NamaKabupaten:  dresident.NamaKabupaten,
+			NamaKecamatan:  dresident.NamaKecamatan,
+			NamaKelurahan:  dresident.NamaKelurahan,
+			Nik:            dresident.Nik,
+			Nkk:            dresident.Nkk,
+			NoKtp:          dresident.NoKtp,
+			Rt:             dresident.Rt,
+			Rw:             dresident.Rw,
+			Status:         dresident.Status,
+			StatusTpsLabel: dresident.StatusTpsLabel,
+			Tps:            dresident.Tps,
 		}
 
 		dataAllResident = append(dataAllResident, serverDTO)

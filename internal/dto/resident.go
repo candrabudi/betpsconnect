@@ -13,6 +13,26 @@ type (
 		Count        int `json:"count"`
 	}
 	FindAllResident struct {
+		ID             int    `json:"id"`
+		Nama           string `json:"nama"`
+		Alamat         string `json:"alamat"`
+		JenisKelamin   string `json:"jenisKelamin"`
+		Kawin          string `json:"kawin"`
+		NamaKabupaten  string `json:"namakabupaten"`
+		NamaKecamatan  string `json:"namaKecamatan"`
+		NamaKelurahan  string `json:"namaKelurahan"`
+		Nik            string `json:"nik"`
+		Nkk            string `json:"nkk"`
+		NoKtp          string `json:"noKtp"`
+		Rt             string `json:"rt"`
+		Rw             string `json:"rw"`
+		Status         string `json:"status"`
+		StatusTpsLabel string `json:"statusTpsLabel"`
+		Telp           string `json:"Telp"`
+		Tps            string `json:"tps"`
+	}
+
+	DetailResident struct {
 		ID                 int    `json:"id"`
 		Nama               string `json:"nama"`
 		Alamat             string `json:"alamat"`
