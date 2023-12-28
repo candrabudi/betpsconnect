@@ -1,0 +1,14 @@
+version: "1.0"
+
+services:
+  tpsconnect:
+    build:
+      dockerfile: ./Dockerfile
+    ports:
+      - "8080:8081"
+    networks:
+      - tpsconnect-network
+
+networks:
+  tpsconnect-network:
+    driver: bridge
