@@ -3,6 +3,7 @@ package http
 import (
 	District "betpsconnect/internal/app/district"
 	Resident "betpsconnect/internal/app/resident"
+	SubDistrict "betpsconnect/internal/app/subdistrict"
 	"betpsconnect/internal/factory"
 	"betpsconnect/internal/middleware"
 
@@ -24,6 +25,7 @@ func NewHttp(g *gin.Engine, f *factory.Factory) {
 	v1 := g.Group("/api/v1")
 	Resident.NewHandler(f).Router(v1.Group("/resident"))
 	District.NewHandler(f).Router(v1.Group("/district"))
+	SubDistrict.NewHandler(f).Router(v1.Group("/subdistrict"))
 
 }
 
