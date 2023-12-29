@@ -16,8 +16,8 @@ import (
 )
 
 type Resident interface {
-	GetResidentTps(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultResident, error)
-	GetAllResidents(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultResident, error)
+	GetResidentTps(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultTpsResidents, error)
+	// GetAllResidents(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultResident, error)
 	DetailResident(ctx context.Context, ResidentID int) (dto.DetailResident, error)
 	GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error)
 	Store(ctx context.Context, data model.Resident) error
@@ -34,7 +34,7 @@ func NewResidentRepository(mongoConn *mongo.Client) Resident {
 	}
 }
 
-func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultResident, error) {
+func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultTpsResidents, error) {
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collectionName := "residents"
 
@@ -53,73 +53,58 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 		bsonFilter["tps"] = filter.TPS
 	}
 	if filter.Nama != "" {
-		regex := primitive.Regex{Pattern: filter.Nama, Options: "i"} // "i" adalah opsi untuk pencarian case-insensitive
-		bsonFilter["nama"] = regex
+		// Menggunakan $text operator untuk pencarian nama
+		textFilter := bson.M{"$text": bson.M{"$search": filter.Nama}}
+		// Gabungkan dengan filter lainnya
+		bsonFilter["$or"] = []bson.M{textFilter}
 	}
 	bsonFilter["status"] = "aktif"
-	// Menggunakan EstimatedDocumentCount untuk menghitung total data
+
 	totalResults, err := collection.EstimatedDocumentCount(ctx)
 	if err != nil {
-		return dto.ResultResident{}, err
+		return dto.ResultTpsResidents{}, err
 	}
 
 	findOptions := options.Find().SetLimit(limit).SetSkip(offset)
 	cursor, err := collection.Find(ctx, bsonFilter, findOptions)
 	if err != nil {
-		return dto.ResultResident{}, err
+		return dto.ResultTpsResidents{}, err
 	}
 	defer cursor.Close(ctx)
 
-	var dataAllResident []dto.FindAllResident
+	var dataAllResident []dto.FindTpsResidents
 	for cursor.Next(ctx) {
 		var dresident model.Resident
 		if err := cursor.Decode(&dresident); err != nil {
-			return dto.ResultResident{}, err
-		}
-		age := dresident.Usia
-		if age == 0 {
-			dob, err := time.Parse("2006-01-02", dresident.TanggalLahir)
-			if err != nil {
-				fmt.Println(err)
-			}
-			now := time.Now()
-			age = now.Year() - dob.Year()
-			if now.YearDay() < dob.YearDay() {
-				age--
-			}
+			return dto.ResultTpsResidents{}, err
 		}
 
-		serverDTO := dto.FindAllResident{
-			ID:             dresident.ID,
-			Nama:           dresident.Nama,
-			Alamat:         dresident.Alamat,
-			JenisKelamin:   dresident.JenisKelamin,
-			Kawin:          dresident.Kawin,
-			NamaKabupaten:  dresident.NamaKabupaten,
-			NamaKecamatan:  dresident.NamaKecamatan,
-			NamaKelurahan:  dresident.NamaKelurahan,
-			Nik:            dresident.Nik,
-			Nkk:            dresident.Nkk,
-			NoKtp:          dresident.NoKtp,
-			Rt:             dresident.Rt,
-			Rw:             dresident.Rw,
-			Status:         dresident.Status,
-			StatusTpsLabel: dresident.StatusTpsLabel,
-			Tps:            dresident.Tps,
-			TanggalLahir:   dresident.TanggalLahir,
-			Usia:           age,
+		serverDTO := dto.FindTpsResidents{
+			ID:              dresident.ID,
+			Nama:            dresident.Nama,
+			JenisKelamin:    dresident.JenisKelamin,
+			NamaKabupaten:   dresident.NamaKabupaten,
+			NamaKecamatan:   dresident.NamaKecamatan,
+			NamaKelurahan:   dresident.NamaKelurahan,
+			Nik:             dresident.Nik,
+			Status:          dresident.Status,
+			StatusTpsLabel:  dresident.StatusTpsLabel,
+			Tps:             dresident.Tps,
+			TanggalLahir:    dresident.TanggalLahir,
+			Usia:            dresident.Usia,
+			IsVerrification: dresident.IsVerrification,
 		}
 
 		dataAllResident = append(dataAllResident, serverDTO)
 	}
 
 	if err := cursor.Err(); err != nil {
-		return dto.ResultResident{}, err
+		return dto.ResultTpsResidents{}, err
 	}
 
 	count := len(dataAllResident)
 
-	result := dto.ResultResident{
+	result := dto.ResultTpsResidents{
 		Items: dataAllResident,
 		Metadata: dto.MetaData{
 			TotalResults: int(totalResults),
@@ -428,4 +413,27 @@ func (r *resident) getLastPerson(ctx context.Context, collection *mongo.Collecti
 	}
 
 	return person, nil
+}
+
+// Fungsi untuk mendapatkan ID dokumen terakhir dari halaman sebelumnya
+func (r *resident) getLastDocumentIDFromPreviousPage(ctx context.Context, collection *mongo.Collection, filter bson.M, offset int64) primitive.ObjectID {
+	findOptions := options.Find().SetLimit(1).SetSkip(offset - 1).SetSort(bson.M{"_id": 1})
+	cursor, err := collection.Find(ctx, filter, findOptions)
+	if err != nil {
+		// Penanganan kesalahan
+		return primitive.NilObjectID
+	}
+	defer cursor.Close(ctx)
+
+	var lastDocID primitive.ObjectID
+	for cursor.Next(ctx) {
+		var doc bson.M
+		if err := cursor.Decode(&doc); err != nil {
+			// Penanganan kesalahan
+			return primitive.NilObjectID
+		}
+		lastDocID = doc["_id"].(primitive.ObjectID)
+	}
+
+	return lastDocID
 }

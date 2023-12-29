@@ -17,7 +17,7 @@ type service struct {
 }
 
 type Service interface {
-	GetListResident(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultResident, error)
+	GetListResident(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultTpsResidents, error)
 	DetailResident(ctx context.Context, ResidentID int) (dto.DetailResident, error)
 	GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error)
 	Store(ctx context.Context, payload dto.PayloadStoreResident) error
@@ -32,19 +32,19 @@ func NewService(f *factory.Factory) Service {
 	}
 }
 
-func (s *service) GetListResident(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultResident, error) {
+func (s *service) GetListResident(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultTpsResidents, error) {
 	user := userSess.(model.User)
 
 	if user.Role == "admin" {
 		filter.NamaKabupaten = user.Regency
 	}
 
-	resultResident, err := s.residentRepository.GetResidentTps(ctx, limit, offset, filter)
+	ResultTpsResidents, err := s.residentRepository.GetResidentTps(ctx, limit, offset, filter)
 	if err != nil {
-		return dto.ResultResident{}, err
+		return dto.ResultTpsResidents{}, err
 	}
 
-	return resultResident, nil
+	return ResultTpsResidents, nil
 }
 
 func (s *service) DetailResident(ctx context.Context, ResidentID int) (dto.DetailResident, error) {

@@ -1,6 +1,10 @@
 package dto
 
 type (
+	ResultTpsResidents struct {
+		Items    []FindTpsResidents `json:"items"`
+		Metadata MetaData           `json:"metadata"`
+	}
 	ResultResident struct {
 		Items    []FindAllResident `json:"items"`
 		Metadata MetaData          `json:"metadata"`
@@ -32,6 +36,22 @@ type (
 		Usia           int    `json:"usia"`
 		Telp           string `json:"telp"`
 		Tps            string `json:"tps"`
+	}
+	FindTpsResidents struct {
+		ID              int    `json:"id"`
+		Nama            string `json:"nama"`
+		JenisKelamin    string `json:"jenis_kelamin"`
+		NamaKabupaten   string `json:"nama_kabupaten"`
+		NamaKecamatan   string `json:"nama_kecamatan"`
+		NamaKelurahan   string `json:"nama_kelurahan"`
+		Nik             string `json:"nik"`
+		Status          string `json:"status"`
+		TanggalLahir    string `json:"tanggal_lahir"`
+		StatusTpsLabel  string `json:"status_tps_label"`
+		Telp            string `json:"telp"`
+		Tps             string `json:"tps"`
+		Usia            int    `json:"usia"`
+		IsVerrification int    `json:"is_verification"`
 	}
 
 	DetailResident struct {
