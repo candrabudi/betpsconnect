@@ -17,6 +17,7 @@ import (
 
 type Resident interface {
 	GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultResident, error)
+	GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) (dto.FindTpsByDistrict, error)
 	Store(ctx context.Context, data model.Resident) error
 	GetKecamatanByKabupaten(ctx context.Context, kabupatenName string) ([]dto.FindAllResidentGrouped, error)
 }
@@ -132,12 +133,58 @@ func (r *resident) Store(ctx context.Context, data model.Resident) error {
 	collectionName := "residents"
 
 	collection := r.MongoConn.Database(dbName).Collection(collectionName)
+	lastPersonID := r.getLastPersonID(ctx, collection)
+	fmt.Println(lastPersonID)
+	newUserID := lastPersonID + 1
+	data.ID = newUserID
 
 	_, err := collection.InsertOne(ctx, data)
 	if err != nil {
 		return err
 	}
 	return nil
+}
+
+func (r *resident) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) (dto.FindTpsByDistrict, error) {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "residents"
+
+	collection := r.MongoConn.Database(dbName).Collection(collectionName)
+
+	pipeline := bson.A{
+		bson.M{
+			"$match": bson.M{
+				"nama_kabupaten": filter.NamaKabupaten,
+				"nama_kecamatan": filter.NamaKecamatan,
+				"nama_kelurahan": filter.NamaKelurahan,
+			},
+		},
+		bson.M{
+			"$sort": bson.M{"tps": -1},
+		},
+		bson.M{
+			"$limit": 1,
+		},
+	}
+
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return dto.FindTpsByDistrict{}, err
+	}
+	defer cursor.Close(ctx)
+
+	var result dto.FindTpsByDistrict
+	if cursor.Next(ctx) {
+		if err := cursor.Decode(&result); err != nil {
+			return dto.FindTpsByDistrict{}, err
+		}
+	}
+
+	if err := cursor.Err(); err != nil {
+		return dto.FindTpsByDistrict{}, err
+	}
+
+	return result, nil
 }
 
 func (r *resident) GetKecamatanByKabupaten(ctx context.Context, kabupatenName string) ([]dto.FindAllResidentGrouped, error) {
@@ -211,4 +258,29 @@ func (r *resident) checkCollectionExists(ctx context.Context, dbName, collection
 	}
 
 	return nil
+}
+func (r *resident) getLastPersonID(ctx context.Context, collection *mongo.Collection) int {
+	opts := options.Find().SetSort(bson.D{{"$natural", -1}}).SetLimit(1)
+
+	cursor, err := collection.Find(ctx, bson.D{}, opts)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return 0 // Jika tidak ada dokumen, kembalikan 0 (tidak ada data)
+		}
+		return 0 // Kembalikan 0 jika ada kesalahan dalam mengambil data
+	}
+	defer cursor.Close(ctx)
+
+	if !cursor.Next(ctx) {
+		return 0 // Jika tidak ada dokumen yang ditemukan, kembalikan 0 (tidak ada data)
+	}
+
+	var person model.Resident
+	if err := cursor.Decode(&person); err != nil {
+		return 0 // Kembalikan 0 jika ada kesalahan dalam membaca data
+	}
+
+	lastPersonID := person.ID
+
+	return lastPersonID
 }

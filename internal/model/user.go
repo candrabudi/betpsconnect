@@ -5,6 +5,7 @@ type User struct {
 	FullName string `bson:"full_name,omitempty"`
 	Email    string `bson:"email,omitempty"`
 	Password string `bson:"password,omitempty"`
-	City     string `bson:"city,empty"`
+	Regency  string `bson:"regency,empty"`
 	Role     string `bson:"role, omitempty"`
+	Status   string `bson:"status, omitempty"`
 }

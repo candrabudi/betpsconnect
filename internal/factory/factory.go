@@ -21,7 +21,7 @@ func NewFactory() *Factory {
 		DistrictRepository:    repository.NewDistrictRepository(mongoConn),
 		SubDistrictRepository: repository.NewSubDistrictRepository(mongoConn),
 		CityRepository:        repository.NewSubDistrictRepository(mongoConn),
-		UserRepository:        repository.NewSubDistrictRepository(mongoConn),
-		UserTokenRepository:   repository.NewSubDistrictRepository(mongoConn),
+		UserRepository:        repository.NewUserRepository(mongoConn),
+		UserTokenRepository:   repository.NewUserTokenRepository(mongoConn),
 	}
 }

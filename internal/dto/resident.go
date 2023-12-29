@@ -99,4 +99,11 @@ type (
 		NamaKelurahan string `json:"nama_kelurahan"`
 		Count         int32  `json:"count"`
 	}
+
+	FindTpsByDistrict struct {
+		NamaKabupaten string `json:"nama_kabupaten"`
+		NamaKecamatan string `json:"nama_kecamatan"`
+		NamaKelurahan string `json:"nama_kelurahan"`
+		TotalTps      string `json:"total_tps"`
+	}
 )

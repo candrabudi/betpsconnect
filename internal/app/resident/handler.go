@@ -57,6 +57,26 @@ func (h *handler) GetResidents(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (h *handler) GetTpsBySubDistrict(c *gin.Context) {
+	ctx := c.Request.Context()
+	filter := dto.FindTpsByDistrict{
+		NamaKabupaten: c.Query("nama_kabupaten"),
+		NamaKecamatan: c.Query("nama_kecamatan"),
+		NamaKelurahan: c.Query("nama_kelurahan"),
+	}
+
+	// Menggunakan nilai limit, offset, dan filter untuk memanggil service.GetListResident
+	data, err := h.service.GetTpsBySubDistrict(ctx, filter)
+	if err != nil {
+		response := util.APIResponse("Failed to retrieve tps : "+err.Error(), http.StatusInternalServerError, "failed", nil)
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	response := util.APIResponse("Success get data tps", http.StatusOK, "success", data)
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *handler) GetGroupBy(c *gin.Context) {
 	ctx := c.Request.Context()
 
