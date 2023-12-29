@@ -18,6 +18,7 @@ type service struct {
 
 type Service interface {
 	GetListResident(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultResident, error)
+	DetailResident(ctx context.Context, ResidentID int) (dto.DetailResident, error)
 	GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error)
 	Store(ctx context.Context, payload dto.PayloadStoreResident) error
 	GetListResidentGroup(ctx context.Context) error
@@ -41,6 +42,15 @@ func (s *service) GetListResident(ctx context.Context, limit, offset int64, filt
 	resultResident, err := s.residentRepository.GetResidentTps(ctx, limit, offset, filter)
 	if err != nil {
 		return dto.ResultResident{}, err
+	}
+
+	return resultResident, nil
+}
+
+func (s *service) DetailResident(ctx context.Context, ResidentID int) (dto.DetailResident, error) {
+	resultResident, err := s.residentRepository.DetailResident(ctx, ResidentID)
+	if err != nil {
+		return dto.DetailResident{}, err
 	}
 
 	return resultResident, nil

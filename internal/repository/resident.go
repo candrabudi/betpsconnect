@@ -18,6 +18,7 @@ import (
 type Resident interface {
 	GetResidentTps(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultResident, error)
 	GetAllResidents(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultResident, error)
+	DetailResident(ctx context.Context, ResidentID int) (dto.DetailResident, error)
 	GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error)
 	Store(ctx context.Context, data model.Resident) error
 	GetKecamatanByKabupaten(ctx context.Context, kabupatenName string) ([]dto.FindAllResidentGrouped, error)
@@ -227,23 +228,65 @@ func (r *resident) GetAllResidents(ctx context.Context, limit, offset int64, fil
 	return result, nil
 }
 
+func (r *resident) DetailResident(ctx context.Context, ResidentID int) (dto.DetailResident, error) {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "residents"
+
+	collection := r.MongoConn.Database(dbName).Collection(collectionName)
+	bsonFilter := bson.M{}
+	bsonFilter["id"] = ResidentID
+	var dresident model.Resident
+	err := collection.FindOne(ctx, bsonFilter).Decode(&dresident)
+	if err != nil {
+		return dto.DetailResident{}, err
+	}
+	residentDTO := dto.DetailResident{
+		ID:              dresident.ID,
+		Nama:            dresident.Nama,
+		Alamat:          dresident.Alamat,
+		Difabel:         dresident.Difabel,
+		Ektp:            dresident.Ektp,
+		Email:           dresident.Email,
+		JenisKelamin:    dresident.JenisKelamin,
+		Kawin:           dresident.Kawin,
+		NamaKabupaten:   dresident.NamaKabupaten,
+		NamaKecamatan:   dresident.NamaKecamatan,
+		NamaKelurahan:   dresident.NamaKelurahan,
+		Nik:             dresident.Nik,
+		Nkk:             dresident.Nkk,
+		NoKtp:           dresident.NoKtp,
+		Rt:              dresident.Rt,
+		Rw:              dresident.Rw,
+		SaringanID:      dresident.SaringanID,
+		Status:          dresident.Status,
+		StatusTpsLabel:  dresident.StatusTpsLabel,
+		TanggalLahir:    dresident.TanggalLahir,
+		Usia:            dresident.Usia,
+		TempatLahir:     dresident.TempatLahir,
+		Telp:            dresident.Telp,
+		Tps:             dresident.Tps,
+		IsVerrification: dresident.IsVerrification,
+	}
+
+	return residentDTO, nil
+}
+
 func (r *resident) Store(ctx context.Context, data model.Resident) error {
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collectionName := "residents"
 
 	collection := r.MongoConn.Database(dbName).Collection(collectionName)
-	person, err := r.getLastPerson(ctx, collection) // Mengambil ID terakhir
+	person, err := r.getLastPerson(ctx, collection)
 	if err != nil {
-		return err // Mengembalikan error jika ada kesalahan dalam mengambil ID terakhir
+		return err
 	}
-	newUserID := person.ID + 1 // Menambahkan 1 ke ID terakhir untuk membuat ID baru
-	data.ID = newUserID        // Menetapkan ID baru pada data yang akan disimpan
-
+	newUserID := person.ID + 1
+	data.ID = newUserID
 	_, err = collection.InsertOne(ctx, data)
 	if err != nil {
-		return err // Mengembalikan error jika ada kesalahan saat menyimpan data
+		return err
 	}
-	return nil // Mengembalikan nilai nil jika penyimpanan berhasil
+	return nil
 }
 
 func (r *resident) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error) {

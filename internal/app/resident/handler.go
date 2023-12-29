@@ -88,6 +88,20 @@ func (h *handler) GetGroupBy(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (h *handler) DetailResident(c *gin.Context) {
+	ctx := c.Request.Context()
+	ResidentID, _ := strconv.Atoi(c.Param("resident_id"))
+	result, err := h.service.DetailResident(ctx, ResidentID)
+	if err != nil {
+		response := util.APIResponse("Failed to retrieve resident list: "+err.Error(), http.StatusInternalServerError, "failed", nil)
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	response := util.APIResponse("Success get detail of resident", http.StatusOK, "success", result)
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *handler) Store(c *gin.Context) {
 	var payload dto.PayloadStoreResident
 	if err := c.ShouldBind(&payload); err != nil {
