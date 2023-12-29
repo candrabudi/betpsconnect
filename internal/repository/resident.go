@@ -39,6 +39,7 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 	collectionName := "residents"
 
 	collection := r.MongoConn.Database(dbName).Collection(collectionName)
+
 	bsonFilter := bson.M{}
 	if filter.NamaKabupaten != "" {
 		bsonFilter["nama_kabupaten"] = filter.NamaKabupaten
@@ -53,18 +54,18 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 		bsonFilter["tps"] = filter.TPS
 	}
 	if filter.Nama != "" {
-		// Menggunakan $text operator untuk pencarian nama
 		textFilter := bson.M{"$text": bson.M{"$search": filter.Nama}}
-		// Gabungkan dengan filter lainnya
 		bsonFilter["$or"] = []bson.M{textFilter}
 	}
 	bsonFilter["status"] = "aktif"
 
-	totalResults, err := collection.EstimatedDocumentCount(ctx)
+	// Fetching total count
+	totalResults, err := collection.CountDocuments(ctx, bsonFilter)
 	if err != nil {
 		return dto.ResultTpsResidents{}, err
 	}
 
+	// Fetching paginated data
 	findOptions := options.Find().SetLimit(limit).SetSkip(offset)
 	cursor, err := collection.Find(ctx, bsonFilter, findOptions)
 	if err != nil {
@@ -80,19 +81,13 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 		}
 
 		serverDTO := dto.FindTpsResidents{
-			ID:              dresident.ID,
-			Nama:            dresident.Nama,
-			JenisKelamin:    dresident.JenisKelamin,
-			NamaKabupaten:   dresident.NamaKabupaten,
-			NamaKecamatan:   dresident.NamaKecamatan,
-			NamaKelurahan:   dresident.NamaKelurahan,
-			Nik:             dresident.Nik,
-			Status:          dresident.Status,
-			StatusTpsLabel:  dresident.StatusTpsLabel,
-			Tps:             dresident.Tps,
-			TanggalLahir:    dresident.TanggalLahir,
-			Usia:            dresident.Usia,
-			IsVerrification: dresident.IsVerrification,
+			ID:           dresident.ID,
+			Nama:         dresident.Nama,
+			JenisKelamin: dresident.JenisKelamin,
+			Nik:          dresident.Nik,
+			Status:       dresident.Status,
+			IsTrue:       dresident.IsTrue,
+			IsFalse:      dresident.IsFalse,
 		}
 
 		dataAllResident = append(dataAllResident, serverDTO)
@@ -226,31 +221,30 @@ func (r *resident) DetailResident(ctx context.Context, ResidentID int) (dto.Deta
 		return dto.DetailResident{}, err
 	}
 	residentDTO := dto.DetailResident{
-		ID:              dresident.ID,
-		Nama:            dresident.Nama,
-		Alamat:          dresident.Alamat,
-		Difabel:         dresident.Difabel,
-		Ektp:            dresident.Ektp,
-		Email:           dresident.Email,
-		JenisKelamin:    dresident.JenisKelamin,
-		Kawin:           dresident.Kawin,
-		NamaKabupaten:   dresident.NamaKabupaten,
-		NamaKecamatan:   dresident.NamaKecamatan,
-		NamaKelurahan:   dresident.NamaKelurahan,
-		Nik:             dresident.Nik,
-		Nkk:             dresident.Nkk,
-		NoKtp:           dresident.NoKtp,
-		Rt:              dresident.Rt,
-		Rw:              dresident.Rw,
-		SaringanID:      dresident.SaringanID,
-		Status:          dresident.Status,
-		StatusTpsLabel:  dresident.StatusTpsLabel,
-		TanggalLahir:    dresident.TanggalLahir,
-		Usia:            dresident.Usia,
-		TempatLahir:     dresident.TempatLahir,
-		Telp:            dresident.Telp,
-		Tps:             dresident.Tps,
-		IsVerrification: dresident.IsVerrification,
+		ID:             dresident.ID,
+		Nama:           dresident.Nama,
+		Alamat:         dresident.Alamat,
+		Difabel:        dresident.Difabel,
+		Ektp:           dresident.Ektp,
+		Email:          dresident.Email,
+		JenisKelamin:   dresident.JenisKelamin,
+		Kawin:          dresident.Kawin,
+		NamaKabupaten:  dresident.NamaKabupaten,
+		NamaKecamatan:  dresident.NamaKecamatan,
+		NamaKelurahan:  dresident.NamaKelurahan,
+		Nik:            dresident.Nik,
+		Nkk:            dresident.Nkk,
+		NoKtp:          dresident.NoKtp,
+		Rt:             dresident.Rt,
+		Rw:             dresident.Rw,
+		SaringanID:     dresident.SaringanID,
+		Status:         dresident.Status,
+		StatusTpsLabel: dresident.StatusTpsLabel,
+		TanggalLahir:   dresident.TanggalLahir,
+		Usia:           dresident.Usia,
+		TempatLahir:    dresident.TempatLahir,
+		Telp:           dresident.Telp,
+		Tps:            dresident.Tps,
 	}
 
 	return residentDTO, nil

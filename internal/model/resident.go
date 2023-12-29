@@ -27,7 +27,8 @@ type Resident struct {
 	StatusTpsLabel     string    `bson:"status_tps_label,empty"`
 	TanggalLahir       string    `bson:"tanggal_lahir,empty"`
 	Usia               int       `bson:"usia", empty`
-	IsVerrification    int       `bson:"is_verification", empty`
+	IsTrue             int       `bson:"is_true", empty`
+	IsFalse            int       `bson:"is_false", empty`
 	TempatLahir        string    `bson:"tempat_lahir,empty"`
 	TanggalLahirString string    `bson:"tanggal_lahir_string,empty"`
 	Telp               string    `bson:"telp,empty"`
