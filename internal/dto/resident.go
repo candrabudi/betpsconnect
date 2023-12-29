@@ -27,6 +27,7 @@ type (
 		Rt             string `json:"rt"`
 		Rw             string `json:"rw"`
 		Status         string `json:"status"`
+		TanggalLahir   string `json:"tanggal_lahir"`
 		StatusTpsLabel string `json:"status_tps_label"`
 		Usia           int    `json:"usia"`
 		Telp           string `json:"telp"`

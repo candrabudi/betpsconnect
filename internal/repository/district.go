@@ -5,6 +5,7 @@ import (
 	"betpsconnect/internal/model"
 	"betpsconnect/pkg/util"
 	"context"
+	"sort"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,7 +13,7 @@ import (
 )
 
 type District interface {
-	GetByCity(ctx context.Context, filter dto.GetByCity) ([]dto.GetByCity, error)
+	GetByCity(ctx context.Context, filter dto.GetByCity) ([]string, error)
 	FindOne(ctx context.Context, filter dto.GetByCity) (dto.GetByCity, error)
 	Store(ctx context.Context, data model.District) error
 	FindLastOne(ctx context.Context) (dto.GetByCity, error)
@@ -28,7 +29,7 @@ func NewDistrictRepository(mongoConn *mongo.Client) District {
 	}
 }
 
-func (d *district) GetByCity(ctx context.Context, filter dto.GetByCity) ([]dto.GetByCity, error) {
+func (d *district) GetByCity(ctx context.Context, filter dto.GetByCity) ([]string, error) {
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collectionName := "districts"
 
@@ -48,26 +49,23 @@ func (d *district) GetByCity(ctx context.Context, filter dto.GetByCity) ([]dto.G
 	}
 	defer cursor.Close(ctx)
 
-	var dataDistrictByCity []dto.GetByCity
+	var kecamatan []string
 	for cursor.Next(ctx) {
 		var dresident model.Resident
 		if err := cursor.Decode(&dresident); err != nil {
 			return nil, err
 		}
-		districtDTO := dto.GetByCity{
-			ID:            dresident.ID,
-			NamaKabupaten: dresident.NamaKabupaten,
-			NamaKecamatan: dresident.NamaKecamatan,
-		}
-
-		dataDistrictByCity = append(dataDistrictByCity, districtDTO)
+		kecamatan = append(kecamatan, dresident.NamaKecamatan)
 	}
 
 	if err := cursor.Err(); err != nil {
 		return nil, err
 	}
 
-	return dataDistrictByCity, nil
+	// Menggunakan sort.Strings untuk mengurutkan kecamatan dari awal ke akhir
+	sort.Strings(kecamatan)
+
+	return kecamatan, nil
 }
 
 func (s *district) FindOne(ctx context.Context, filter dto.GetByCity) (dto.GetByCity, error) {

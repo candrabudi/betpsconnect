@@ -5,7 +5,6 @@ import (
 	"betpsconnect/internal/model"
 	"betpsconnect/pkg/util"
 	"context"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -18,7 +17,7 @@ import (
 type User interface {
 	LoginUser(ctx context.Context, email, password string) (string, error)
 	FindOneByEmail(ctx context.Context, email string) (dto.FindOneUser, error)
-	FindOne(ctx context.Context, UserID int) (dto.FindOneUser, error)
+	FindOne(ctx context.Context, UserID int) (model.User, error)
 }
 
 type user struct {
@@ -105,7 +104,6 @@ func (u *user) FindOneByEmail(ctx context.Context, email string) (dto.FindOneUse
 	if err != nil {
 		return dto.FindOneUser{}, err
 	}
-	fmt.Println(duser)
 	userDTO := dto.FindOneUser{
 		ID:       duser.ID,
 		FullName: duser.FullName,
@@ -118,7 +116,7 @@ func (u *user) FindOneByEmail(ctx context.Context, email string) (dto.FindOneUse
 	return userDTO, nil
 }
 
-func (u *user) FindOne(ctx context.Context, UserID int) (dto.FindOneUser, error) {
+func (u *user) FindOne(ctx context.Context, UserID int) (model.User, error) {
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collectionName := "users"
 
@@ -128,10 +126,9 @@ func (u *user) FindOne(ctx context.Context, UserID int) (dto.FindOneUser, error)
 	var duser model.User
 	err := collection.FindOne(ctx, bsonFilter).Decode(&duser)
 	if err != nil {
-		return dto.FindOneUser{}, err
+		return model.User{}, err
 	}
-	fmt.Println(duser)
-	userDTO := dto.FindOneUser{
+	userDTO := model.User{
 		ID:       duser.ID,
 		FullName: duser.FullName,
 		Regency:  duser.Regency,

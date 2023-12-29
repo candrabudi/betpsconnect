@@ -12,7 +12,7 @@ type service struct {
 }
 
 type Service interface {
-	GetDistrictByCity(ctx context.Context, filter dto.GetByCity) ([]dto.GetByCity, error)
+	GetDistrictByCity(ctx context.Context, filter dto.GetByCity) ([]string, error)
 }
 
 func NewService(f *factory.Factory) Service {
@@ -21,11 +21,10 @@ func NewService(f *factory.Factory) Service {
 	}
 }
 
-func (s *service) GetDistrictByCity(ctx context.Context, filter dto.GetByCity) ([]dto.GetByCity, error) {
+func (s *service) GetDistrictByCity(ctx context.Context, filter dto.GetByCity) ([]string, error) {
 	resultDistrictByCity, err := s.districtRepository.GetByCity(ctx, filter)
 	if err != nil {
 		return nil, err
 	}
-
 	return resultDistrictByCity, nil
 }

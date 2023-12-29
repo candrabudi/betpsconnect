@@ -20,7 +20,7 @@ func NewFactory() *Factory {
 		ResidentRepository:    repository.NewResidentRepository(mongoConn),
 		DistrictRepository:    repository.NewDistrictRepository(mongoConn),
 		SubDistrictRepository: repository.NewSubDistrictRepository(mongoConn),
-		CityRepository:        repository.NewSubDistrictRepository(mongoConn),
+		CityRepository:        repository.NewCityRepository(mongoConn),
 		UserRepository:        repository.NewUserRepository(mongoConn),
 		UserTokenRepository:   repository.NewUserTokenRepository(mongoConn),
 	}

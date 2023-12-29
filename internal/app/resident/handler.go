@@ -24,19 +24,16 @@ func NewHandler(f *factory.Factory) *handler {
 
 func (h *handler) GetResidents(c *gin.Context) {
 	ctx := c.Request.Context()
-
-	// Mendapatkan nilai limit dan offset dari permintaan HTTP
 	limit, err := strconv.ParseInt(c.Query("limit"), 10, 64)
 	if err != nil || limit <= 0 {
-		limit = 20 // Nilai default jika limit tidak valid atau tidak ada dalam permintaan
+		limit = 20
 	}
 
 	offset, err := strconv.ParseInt(c.Query("offset"), 10, 64)
 	if err != nil || offset < 0 {
-		offset = 0 // Nilai default jika offset tidak valid atau tidak ada dalam permintaan
+		offset = 0
 	}
 
-	// Membuat DTO ResidentFilter dari nilai yang diterima dari permintaan HTTP
 	filter := dto.ResidentFilter{
 		NamaKabupaten: c.Query("nama_kabupaten"),
 		NamaKecamatan: c.Query("nama_kecamatan"),
@@ -46,7 +43,7 @@ func (h *handler) GetResidents(c *gin.Context) {
 	}
 
 	// Menggunakan nilai limit, offset, dan filter untuk memanggil service.GetListResident
-	data, err := h.service.GetListResident(ctx, limit, offset, filter)
+	data, err := h.service.GetListResident(ctx, limit, offset, filter, c.Value("user"))
 	if err != nil {
 		response := util.APIResponse("Failed to retrieve resident list: "+err.Error(), http.StatusInternalServerError, "failed", nil)
 		c.JSON(http.StatusInternalServerError, response)
