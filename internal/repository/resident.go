@@ -56,7 +56,7 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 		regex := primitive.Regex{Pattern: filter.Nama, Options: "i"} // "i" adalah opsi untuk pencarian case-insensitive
 		bsonFilter["nama"] = regex
 	}
-
+	bsonFilter["status"] = "aktif"
 	// Menggunakan EstimatedDocumentCount untuk menghitung total data
 	totalResults, err := collection.EstimatedDocumentCount(ctx)
 	if err != nil {
