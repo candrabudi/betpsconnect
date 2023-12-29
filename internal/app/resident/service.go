@@ -6,6 +6,7 @@ import (
 	"betpsconnect/internal/model"
 	"betpsconnect/internal/repository"
 	"context"
+	"errors"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -22,6 +23,7 @@ type Service interface {
 	GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error)
 	Store(ctx context.Context, payload dto.PayloadStoreResident) error
 	GetListResidentGroup(ctx context.Context) error
+	UpdateValidInvalidPerson(ctx context.Context, updatePayload dto.PayloadUpdateValidInvalid) error
 }
 
 func NewService(f *factory.Factory) Service {
@@ -54,6 +56,29 @@ func (s *service) DetailResident(ctx context.Context, ResidentID int) (dto.Detai
 	}
 
 	return resultResident, nil
+}
+
+func (s *service) UpdateValidInvalidPerson(ctx context.Context, updatePayload dto.PayloadUpdateValidInvalid) error {
+	// Validation: Neither both 0
+	if updatePayload.IsTrue == 0 && updatePayload.IsFalse == 0 {
+		return errors.New("Please choose either IsTrue or IsFalse")
+	}
+
+	// Validation: Both cannot be selected (1)
+	if updatePayload.IsTrue == 1 && updatePayload.IsFalse == 1 {
+		return errors.New("You can only select one between IsTrue and IsFalse")
+	}
+
+	payload := dto.PayloadUpdateValidInvalid{
+		IsTrue:  updatePayload.IsTrue,
+		IsFalse: updatePayload.IsFalse,
+	}
+	err := s.residentRepository.UpdateValidInvalidPerson(ctx, payload)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (s *service) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error) {

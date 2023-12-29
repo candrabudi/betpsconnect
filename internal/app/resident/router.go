@@ -13,4 +13,5 @@ func (h *handler) Router(g *gin.RouterGroup) {
 	g.GET("/detail/:resident_id", h.DetailResident)
 	g.GET("/tps/subdistrict", h.GetTpsBySubDistrict)
 	g.POST("/store", h.Store)
+	g.POST("/update-valid-invalid", h.UpdateValidInvalidPerson)
 }

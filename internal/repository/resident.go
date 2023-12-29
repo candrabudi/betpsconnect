@@ -17,7 +17,7 @@ import (
 
 type Resident interface {
 	GetResidentTps(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultTpsResidents, error)
-	// GetAllResidents(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultResident, error)
+	UpdateValidInvalidPerson(ctx context.Context, newData dto.PayloadUpdateValidInvalid) error
 	DetailResident(ctx context.Context, ResidentID int) (dto.DetailResident, error)
 	GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error)
 	Store(ctx context.Context, data model.Resident) error
@@ -245,6 +245,8 @@ func (r *resident) DetailResident(ctx context.Context, ResidentID int) (dto.Deta
 		TempatLahir:    dresident.TempatLahir,
 		Telp:           dresident.Telp,
 		Tps:            dresident.Tps,
+		IsTrue:         dresident.IsTrue,
+		IsFalse:        dresident.IsFalse,
 	}
 
 	return residentDTO, nil
@@ -265,6 +267,41 @@ func (r *resident) Store(ctx context.Context, data model.Resident) error {
 	if err != nil {
 		return err
 	}
+	return nil
+}
+
+func (r *resident) UpdateValidInvalidPerson(ctx context.Context, newData dto.PayloadUpdateValidInvalid) error {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "residents"
+
+	collection := r.MongoConn.Database(dbName).Collection(collectionName)
+
+	filter := bson.D{{"id", newData.ResidentID}}
+
+	// Validasi kedua field tidak boleh memiliki nilai yang sama
+	if newData.IsTrue == 1 && newData.IsFalse == 1 {
+		return errors.New("IsTrue and IsFalse cannot both be true")
+	}
+
+	update := bson.D{}
+
+	if newData.IsTrue == 1 {
+		update = bson.D{{"$set", bson.D{
+			{"is_true", newData.IsTrue},
+		}}}
+	} else if newData.IsFalse == 1 {
+		update = bson.D{{"$set", bson.D{
+			{"is_false", newData.IsFalse},
+		}}}
+	}
+
+	if len(update) > 0 {
+		_, err := collection.UpdateOne(ctx, filter, update)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -374,27 +411,6 @@ func (r *resident) GetKecamatanByKabupaten(ctx context.Context, kabupatenName st
 	return dataKecamatanInKabupaten, nil
 }
 
-func (r *resident) checkMongoDBConnection(ctx context.Context) error {
-	if r.MongoConn == nil {
-		return errors.New("MongoDB connection is not established")
-	}
-	return nil
-}
-
-// Helper function to check if the collection exists
-func (r *resident) checkCollectionExists(ctx context.Context, dbName, collectionName string) error {
-	collections, err := r.MongoConn.Database(dbName).ListCollectionNames(ctx, bson.M{"name": collectionName})
-	if err != nil {
-		return err
-	}
-
-	if len(collections) == 0 {
-		return fmt.Errorf("Collection '%s' does not exist in database '%s'", collectionName, dbName)
-	}
-
-	return nil
-}
-
 func (r *resident) getLastPerson(ctx context.Context, collection *mongo.Collection) (model.Resident, error) {
 	opts := options.FindOne().SetSort(bson.D{{"$natural", -1}})
 
@@ -407,27 +423,4 @@ func (r *resident) getLastPerson(ctx context.Context, collection *mongo.Collecti
 	}
 
 	return person, nil
-}
-
-// Fungsi untuk mendapatkan ID dokumen terakhir dari halaman sebelumnya
-func (r *resident) getLastDocumentIDFromPreviousPage(ctx context.Context, collection *mongo.Collection, filter bson.M, offset int64) primitive.ObjectID {
-	findOptions := options.Find().SetLimit(1).SetSkip(offset - 1).SetSort(bson.M{"_id": 1})
-	cursor, err := collection.Find(ctx, filter, findOptions)
-	if err != nil {
-		// Penanganan kesalahan
-		return primitive.NilObjectID
-	}
-	defer cursor.Close(ctx)
-
-	var lastDocID primitive.ObjectID
-	for cursor.Next(ctx) {
-		var doc bson.M
-		if err := cursor.Decode(&doc); err != nil {
-			// Penanganan kesalahan
-			return primitive.NilObjectID
-		}
-		lastDocID = doc["_id"].(primitive.ObjectID)
-	}
-
-	return lastDocID
 }

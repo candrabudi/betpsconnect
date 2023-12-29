@@ -49,31 +49,32 @@ type (
 	}
 
 	DetailResident struct {
-		ID              int    `json:"id"`
-		Nama            string `json:"nama"`
-		Alamat          string `json:"alamat"`
-		Difabel         string `json:"difabel"`
-		Ektp            string `json:"ektp"`
-		Email           string `json:"email"`
-		JenisKelamin    string `json:"jenis_kelamin"`
-		Kawin           string `json:"kawin"`
-		NamaKabupaten   string `json:"nama_kabupaten"`
-		NamaKecamatan   string `json:"nama_kecamatan"`
-		NamaKelurahan   string `json:"nama_kelurahan"`
-		Nik             string `json:"nik"`
-		Nkk             string `json:"nkk"`
-		NoKtp           string `json:"no_ktp"`
-		Rt              string `json:"rt"`
-		Rw              string `json:"rw"`
-		SaringanID      string `json:"saringan_id"`
-		Status          string `json:"status"`
-		StatusTpsLabel  string `json:"status_tps_label"`
-		TanggalLahir    string `json:"tanggal_lahir"`
-		Usia            int    `json:"usia"`
-		TempatLahir     string `json:"tampat_lahir"`
-		Telp            string `json:"telp"`
-		Tps             string `json:"tps"`
-		IsVerrification int    `json:"is_verification"`
+		ID             int    `json:"id"`
+		Nama           string `json:"nama"`
+		Alamat         string `json:"alamat"`
+		Difabel        string `json:"difabel"`
+		Ektp           string `json:"ektp"`
+		Email          string `json:"email"`
+		JenisKelamin   string `json:"jenis_kelamin"`
+		Kawin          string `json:"kawin"`
+		NamaKabupaten  string `json:"nama_kabupaten"`
+		NamaKecamatan  string `json:"nama_kecamatan"`
+		NamaKelurahan  string `json:"nama_kelurahan"`
+		Nik            string `json:"nik"`
+		Nkk            string `json:"nkk"`
+		NoKtp          string `json:"no_ktp"`
+		Rt             string `json:"rt"`
+		Rw             string `json:"rw"`
+		SaringanID     string `json:"saringan_id"`
+		Status         string `json:"status"`
+		StatusTpsLabel string `json:"status_tps_label"`
+		TanggalLahir   string `json:"tanggal_lahir"`
+		Usia           int    `json:"usia"`
+		TempatLahir    string `json:"tampat_lahir"`
+		Telp           string `json:"telp"`
+		Tps            string `json:"tps"`
+		IsTrue         int    `json:"is_true"`
+		IsFalse        int    `json:"is_false"`
 	}
 
 	ResidentFilter struct {
@@ -97,6 +98,12 @@ type (
 		Usia          int    `json:"usia" binding:"required"`
 		Telp          string `json:"Telp" binding:"required"`
 		Tps           string `json:"tps" binding:"required"`
+	}
+
+	PayloadUpdateValidInvalid struct {
+		ResidentID int `json:"resident_id" binding:required`
+		IsTrue     int `json:"is_true" binding:"required"`
+		IsFalse    int `json:"is_false" binding:"required"`
 	}
 
 	FindAllResidentGrouped struct {

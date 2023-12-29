@@ -123,6 +123,31 @@ func (h *handler) Store(c *gin.Context) {
 		return
 	}
 
-	response := util.APIResponse("Success store server", http.StatusOK, "success", nil)
+	response := util.APIResponse("Success store resident", http.StatusOK, "success", nil)
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) UpdateValidInvalidPerson(c *gin.Context) {
+	var payload dto.PayloadUpdateValidInvalid
+	if err := c.ShouldBind(&payload); err != nil {
+		errorMessage := gin.H{"errors": "Please fill data"}
+		if err != io.EOF {
+			errors := util.FormatValidationError(err)
+			errorMessage = gin.H{"errors": errors}
+		}
+		response := util.APIResponse("Error validation", http.StatusUnprocessableEntity, "failed", errorMessage)
+		c.JSON(http.StatusUnprocessableEntity, response)
+		return
+	}
+
+	err := h.service.UpdateValidInvalidPerson(c, payload)
+
+	if err != nil {
+		response := util.APIResponse(fmt.Sprintf("%s", err.Error()), http.StatusBadRequest, "failed", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := util.APIResponse("Success update resident", http.StatusOK, "success", nil)
 	c.JSON(http.StatusOK, response)
 }
