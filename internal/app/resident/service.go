@@ -23,7 +23,7 @@ type Service interface {
 	GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error)
 	Store(ctx context.Context, payload dto.PayloadStoreResident) error
 	GetListResidentGroup(ctx context.Context) error
-	UpdateValidInvalidPerson(ctx context.Context, updatePayload dto.PayloadUpdateValidInvalid) error
+	residentValidate(ctx context.Context, updatePayload dto.PayloadUpdateValidInvalid) ([]int, error)
 }
 
 func NewService(f *factory.Factory) Service {
@@ -35,18 +35,21 @@ func NewService(f *factory.Factory) Service {
 }
 
 func (s *service) GetListResident(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultTpsResidents, error) {
-	user := userSess.(model.User)
+	user, ok := userSess.(model.User)
+	if !ok {
+		return dto.ResultTpsResidents{}, errors.New("invalid user session data")
+	}
 
 	if user.Role == "admin" {
 		filter.NamaKabupaten = user.Regency
 	}
 
-	ResultTpsResidents, err := s.residentRepository.GetResidentTps(ctx, limit, offset, filter)
+	resultTpsResidents, err := s.residentRepository.GetResidentTps(ctx, limit, offset, filter)
 	if err != nil {
 		return dto.ResultTpsResidents{}, err
 	}
 
-	return ResultTpsResidents, nil
+	return resultTpsResidents, nil
 }
 
 func (s *service) DetailResident(ctx context.Context, ResidentID int) (dto.DetailResident, error) {
@@ -58,27 +61,22 @@ func (s *service) DetailResident(ctx context.Context, ResidentID int) (dto.Detai
 	return resultResident, nil
 }
 
-func (s *service) UpdateValidInvalidPerson(ctx context.Context, updatePayload dto.PayloadUpdateValidInvalid) error {
-	// Validation: Neither both 0
-	if updatePayload.IsTrue == 0 && updatePayload.IsFalse == 0 {
-		return errors.New("Please choose either IsTrue or IsFalse")
-	}
-
-	// Validation: Both cannot be selected (1)
-	if updatePayload.IsTrue == 1 && updatePayload.IsFalse == 1 {
-		return errors.New("You can only select one between IsTrue and IsFalse")
+func (s *service) residentValidate(ctx context.Context, updatePayload dto.PayloadUpdateValidInvalid) ([]int, error) {
+	if updatePayload.IsTrue != true && updatePayload.IsTrue != false {
+		return nil, errors.New("Please insert a valid value (true or false) for IsTrue")
 	}
 
 	payload := dto.PayloadUpdateValidInvalid{
-		IsTrue:  updatePayload.IsTrue,
-		IsFalse: updatePayload.IsFalse,
-	}
-	err := s.residentRepository.UpdateValidInvalidPerson(ctx, payload)
-	if err != nil {
-		return err
+		ResidentID: updatePayload.ResidentID,
+		IsTrue:     updatePayload.IsTrue,
 	}
 
-	return nil
+	results, err := s.residentRepository.ResidentValidate(ctx, payload)
+	if err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
 
 func (s *service) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error) {

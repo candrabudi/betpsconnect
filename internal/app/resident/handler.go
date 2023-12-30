@@ -127,7 +127,7 @@ func (h *handler) Store(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
-func (h *handler) UpdateValidInvalidPerson(c *gin.Context) {
+func (h *handler) ValidateResident(c *gin.Context) {
 	var payload dto.PayloadUpdateValidInvalid
 	if err := c.ShouldBind(&payload); err != nil {
 		errorMessage := gin.H{"errors": "Please fill data"}
@@ -140,7 +140,7 @@ func (h *handler) UpdateValidInvalidPerson(c *gin.Context) {
 		return
 	}
 
-	err := h.service.UpdateValidInvalidPerson(c, payload)
+	results, err := h.service.residentValidate(c, payload)
 
 	if err != nil {
 		response := util.APIResponse(fmt.Sprintf("%s", err.Error()), http.StatusBadRequest, "failed", nil)
@@ -148,6 +148,6 @@ func (h *handler) UpdateValidInvalidPerson(c *gin.Context) {
 		return
 	}
 
-	response := util.APIResponse("Success update resident", http.StatusOK, "success", nil)
+	response := util.APIResponse("Success validate resident", http.StatusOK, "success", results)
 	c.JSON(http.StatusOK, response)
 }

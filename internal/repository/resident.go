@@ -17,7 +17,7 @@ import (
 
 type Resident interface {
 	GetResidentTps(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultTpsResidents, error)
-	UpdateValidInvalidPerson(ctx context.Context, newData dto.PayloadUpdateValidInvalid) error
+	ResidentValidate(ctx context.Context, newData dto.PayloadUpdateValidInvalid) ([]int, error)
 	DetailResident(ctx context.Context, ResidentID int) (dto.DetailResident, error)
 	GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error)
 	Store(ctx context.Context, data model.Resident) error
@@ -270,39 +270,88 @@ func (r *resident) Store(ctx context.Context, data model.Resident) error {
 	return nil
 }
 
-func (r *resident) UpdateValidInvalidPerson(ctx context.Context, newData dto.PayloadUpdateValidInvalid) error {
+func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpdateValidInvalid) ([]int, error) {
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
-	collectionName := "residents"
+	collection := r.MongoConn.Database(dbName).Collection("residents")
+	var duplicateData []int // To store duplicate data
 
-	collection := r.MongoConn.Database(dbName).Collection(collectionName)
+	for _, residentID := range newData.ResidentID {
+		filter := bson.D{{"id", residentID}}
 
-	filter := bson.D{{"id", newData.ResidentID}}
+		update := bson.D{}
+		if newData.IsTrue == true {
+			dresident, err := r.DetailResident(ctx, residentID)
+			if err != nil {
+				return duplicateData, err
+			}
+			trueResidentCollection := r.MongoConn.Database(dbName).Collection("true_residents")
+			trueFilter := bson.M{"nik": dresident.Nik}
 
-	// Validasi kedua field tidak boleh memiliki nilai yang sama
-	if newData.IsTrue == 1 && newData.IsFalse == 1 {
-		return errors.New("IsTrue and IsFalse cannot both be true")
-	}
+			var mresident model.TrueResident
+			err = trueResidentCollection.FindOne(ctx, trueFilter).Decode(&mresident)
 
-	update := bson.D{}
+			if err == nil {
+				// If duplicate, store the duplicate NIK data
+				duplicateData = append(duplicateData, residentID)
+				continue // Continue to the next iteration
+			}
 
-	if newData.IsTrue == 1 {
-		update = bson.D{{"$set", bson.D{
-			{"is_true", newData.IsTrue},
-		}}}
-	} else if newData.IsFalse == 1 {
-		update = bson.D{{"$set", bson.D{
-			{"is_false", newData.IsFalse},
-		}}}
-	}
+			person, err := r.getLastPerson(ctx, trueResidentCollection)
+			if err != nil {
+				return duplicateData, err
+			}
+			newUserID := person.ID + 1
+			filterUpdate := bson.M{"nik": dresident.Nik}
 
-	if len(update) > 0 {
-		_, err := collection.UpdateOne(ctx, filter, update)
-		if err != nil {
-			return err
+			update := bson.M{
+				"$set": bson.M{
+					"is_true": newData.IsTrue,
+				},
+			}
+			result, err := collection.UpdateOne(ctx, filterUpdate, update)
+			if err != nil {
+				return duplicateData, err
+			}
+			if result.ModifiedCount > 0 {
+				TrueResident := model.TrueResident{
+					ID:          newUserID,
+					ResidentID:  residentID,
+					FullName:    dresident.Nama,
+					Nik:         dresident.Nik,
+					NoHandphone: dresident.Telp,
+					Age:         dresident.Usia,
+					Gender:      dresident.JenisKelamin,
+					BirthDate:   dresident.TanggalLahir,
+					BirthPlace:  dresident.TempatLahir,
+					City:        dresident.NamaKabupaten,
+					District:    dresident.NamaKecamatan,
+					SubDistrict: dresident.NamaKelurahan,
+					Tps:         dresident.Tps,
+					CreatedAt:   time.Now(),
+					UpdatedAt:   time.Now(),
+				}
+				_, errInsert := trueResidentCollection.InsertOne(ctx, TrueResident)
+				if errInsert != nil {
+					return duplicateData, errInsert
+				}
+			} else {
+				return duplicateData, errors.New("No data update resident.")
+			}
+		} else {
+			update = bson.D{{"$set", bson.D{
+				{"is_false", 1},
+			}}}
+		}
+
+		if len(update) > 0 {
+			_, err := collection.UpdateOne(ctx, filter, update)
+			if err != nil {
+				return duplicateData, err
+			}
 		}
 	}
 
-	return nil
+	return duplicateData, nil
 }
 
 func (r *resident) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error) {
@@ -417,9 +466,23 @@ func (r *resident) getLastPerson(ctx context.Context, collection *mongo.Collecti
 	var person model.Resident
 	if err := collection.FindOne(ctx, bson.D{}, opts).Decode(&person); err != nil {
 		if err == mongo.ErrNoDocuments {
-			return model.Resident{}, nil // Jika tidak ada dokumen, kembalikan data kosong (tidak ada data)
+			return model.Resident{}, nil
 		}
-		return model.Resident{}, err // Kembalikan error jika ada kesalahan dalam mengambil data
+		return model.Resident{}, err
+	}
+
+	return person, nil
+}
+
+func (r *resident) GetLastValidPerson(ctx context.Context, collection *mongo.Collection) (model.TrueResident, error) {
+	opts := options.FindOne().SetSort(bson.D{{"$natural", -1}})
+
+	var person model.TrueResident
+	if err := collection.FindOne(ctx, bson.D{}, opts).Decode(&person); err != nil {
+		if err == mongo.ErrNoDocuments {
+			return model.TrueResident{}, nil
+		}
+		return model.TrueResident{}, err
 	}
 
 	return person, nil

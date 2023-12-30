@@ -101,9 +101,13 @@ type (
 	}
 
 	PayloadUpdateValidInvalid struct {
-		ResidentID int `json:"resident_id" binding:required`
-		IsTrue     int `json:"is_true" binding:"required"`
-		IsFalse    int `json:"is_false" binding:"required"`
+		ResidentID []int `json:"resident_id" binding:"required"`
+		IsTrue     bool  `json:"is_true"`
+	}
+
+	ResultsDuplicateUpdateResident struct {
+		Nama string
+		NIK  string
 	}
 
 	FindAllResidentGrouped struct {
