@@ -107,8 +107,6 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 		return dto.ResultTpsResidents{}, err
 	}
 
-	// totalResults := int64(len(dataAllResident))
-
 	result := dto.ResultTpsResidents{
 		Items: dataAllResident,
 		Metadata: dto.MetaData{
@@ -132,47 +130,35 @@ func (r *resident) GetTotalFilteredResidentCount(ctx context.Context, filter dto
 
 	collection := r.MongoConn.Database(dbName).Collection(collectionName)
 
-	pipeline := []bson.M{}
-
-	matchStage := bson.M{}
+	filterOptions := bson.M{}
 
 	if filter.NamaKabupaten != "" {
-		matchStage["nama_kabupaten"] = filter.NamaKabupaten
+		filterOptions["nama_kabupaten"] = filter.NamaKabupaten
 	}
 
 	if filter.NamaKecamatan != "" {
-		matchStage["nama_kecamatan"] = filter.NamaKecamatan
+		filterOptions["nama_kecamatan"] = filter.NamaKecamatan
 	}
 
 	if filter.NamaKelurahan != "" {
-		matchStage["nama_kelurahan"] = filter.NamaKelurahan
+		filterOptions["nama_kelurahan"] = filter.NamaKelurahan
 	}
 
 	if filter.TPS != "" {
-		matchStage["tps"] = filter.TPS
+		filterOptions["tps"] = filter.TPS
 	}
 
 	if filter.Nama != "" {
 		regexPattern := regexp.QuoteMeta(filter.Nama)
-		matchStage["$or"] = []bson.M{{"nama": primitive.Regex{Pattern: regexPattern, Options: "i"}}}
+		filterOptions["$or"] = []bson.M{{"nama": primitive.Regex{Pattern: regexPattern, Options: "i"}}}
 	}
 
-	if len(matchStage) > 0 {
-		pipeline = append(pipeline, bson.M{"$match": matchStage})
+	countQuery := []bson.M{
+		{"$match": filterOptions},
+		{"$count": "total"},
 	}
 
-	groupStage := bson.M{
-		"$group": bson.M{
-			"_id": nil,
-			"count": bson.M{
-				"$sum": 1,
-			},
-		},
-	}
-
-	pipeline = append(pipeline, groupStage)
-
-	cursor, err := collection.Aggregate(ctx, pipeline)
+	cursor, err := collection.Aggregate(ctx, countQuery)
 	if err != nil {
 		return 0, err
 	}
@@ -184,7 +170,7 @@ func (r *resident) GetTotalFilteredResidentCount(ctx context.Context, filter dto
 	}
 
 	if len(result) > 0 {
-		total := result[0]["count"].(int32)
+		total := result[0]["total"].(int32)
 		return total, nil
 	}
 
