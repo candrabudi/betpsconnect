@@ -102,6 +102,21 @@ func (h *handler) DetailResident(c *gin.Context) {
 	c.JSON(http.StatusOK, response)
 }
 
+func (h *handler) CheckResidentByNik(c *gin.Context) {
+	ctx := c.Request.Context()
+	Nik := c.Query("nik")
+
+	result, err := h.service.CheckResidentByNik(ctx, Nik)
+	if err != nil {
+		response := util.APIResponse("Failed to retrieve resident list: "+err.Error(), http.StatusInternalServerError, "failed", nil)
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	response := util.APIResponse("Success get data resident by nik", http.StatusOK, "success", result)
+	c.JSON(http.StatusOK, response)
+}
+
 func (h *handler) Store(c *gin.Context) {
 	var payload dto.PayloadStoreResident
 	if err := c.ShouldBind(&payload); err != nil {

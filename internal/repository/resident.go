@@ -19,6 +19,7 @@ type Resident interface {
 	GetResidentTps(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultTpsResidents, error)
 	ResidentValidate(ctx context.Context, newData dto.PayloadUpdateValidInvalid) ([]int, error)
 	DetailResident(ctx context.Context, ResidentID int) (dto.DetailResident, error)
+	CheckResidentByNik(ctx context.Context, Nik string) (dto.DetailResident, error)
 	GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error)
 	Store(ctx context.Context, data model.Resident) error
 	GetKecamatanByKabupaten(ctx context.Context, kabupatenName string) ([]dto.FindAllResidentGrouped, error)
@@ -220,6 +221,50 @@ func (r *resident) DetailResident(ctx context.Context, ResidentID int) (dto.Deta
 	return residentDTO, nil
 }
 
+func (r *resident) CheckResidentByNik(ctx context.Context, Nik string) (dto.DetailResident, error) {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "residents"
+
+	collection := r.MongoConn.Database(dbName).Collection(collectionName)
+	bsonFilter := bson.M{}
+	bsonFilter["nik"] = Nik
+	var dresident model.Resident
+	err := collection.FindOne(ctx, bsonFilter).Decode(&dresident)
+	if err != nil {
+		return dto.DetailResident{}, err
+	}
+	residentDTO := dto.DetailResident{
+		ID:             dresident.ID,
+		Nama:           dresident.Nama,
+		Alamat:         dresident.Alamat,
+		Difabel:        dresident.Difabel,
+		Ektp:           dresident.Ektp,
+		Email:          dresident.Email,
+		JenisKelamin:   dresident.JenisKelamin,
+		Kawin:          dresident.Kawin,
+		NamaKabupaten:  dresident.NamaKabupaten,
+		NamaKecamatan:  dresident.NamaKecamatan,
+		NamaKelurahan:  dresident.NamaKelurahan,
+		Nik:            dresident.Nik,
+		Nkk:            dresident.Nkk,
+		NoKtp:          dresident.NoKtp,
+		Rt:             dresident.Rt,
+		Rw:             dresident.Rw,
+		SaringanID:     dresident.SaringanID,
+		Status:         dresident.Status,
+		StatusTpsLabel: dresident.StatusTpsLabel,
+		TanggalLahir:   dresident.TanggalLahir,
+		Usia:           dresident.Usia,
+		TempatLahir:    dresident.TempatLahir,
+		Telp:           dresident.Telp,
+		Tps:            dresident.Tps,
+		IsTrue:         dresident.IsTrue,
+		IsFalse:        dresident.IsFalse,
+	}
+
+	return residentDTO, nil
+}
+
 func (r *resident) Store(ctx context.Context, data model.Resident) error {
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collectionName := "residents"
@@ -272,7 +317,7 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 
 			update := bson.M{
 				"$set": bson.M{
-					"is_true": newData.IsTrue,
+					"is_true": 1,
 				},
 			}
 			result, err := collection.UpdateOne(ctx, filterUpdate, update)
