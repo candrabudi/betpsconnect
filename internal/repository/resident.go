@@ -87,7 +87,6 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 
 	pipeline = append(pipeline, projectStage)
 
-	// Adding pagination
 	pipeline = append(pipeline, bson.M{"$skip": offset})
 	pipeline = append(pipeline, bson.M{"$limit": limit})
 
@@ -140,11 +139,10 @@ func (r *resident) GetAllResidents(ctx context.Context, limit, offset int64, fil
 		bsonFilter["tps"] = filter.TPS
 	}
 	if filter.Nama != "" {
-		regex := primitive.Regex{Pattern: filter.Nama, Options: "i"} // "i" adalah opsi untuk pencarian case-insensitive
+		regex := primitive.Regex{Pattern: filter.Nama, Options: "i"}
 		bsonFilter["nama"] = regex
 	}
 
-	// Menggunakan EstimatedDocumentCount untuk menghitung total data
 	totalResults, err := collection.EstimatedDocumentCount(ctx)
 	if err != nil {
 		return dto.ResultResident{}, err
@@ -301,9 +299,8 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 			err = trueResidentCollection.FindOne(ctx, trueFilter).Decode(&mresident)
 
 			if err == nil {
-				// If duplicate, store the duplicate NIK data
 				duplicateData = append(duplicateData, residentID)
-				continue // Continue to the next iteration
+				continue
 			}
 
 			person, err := r.getLastPerson(ctx, trueResidentCollection)
@@ -384,7 +381,7 @@ func (r *resident) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsBy
 			},
 		},
 		bson.M{
-			"$sort": bson.M{"_id": 1}, // Urutkan tps dari terkecil ke terbesar
+			"$sort": bson.M{"_id": 1},
 		},
 		bson.M{
 			"$group": bson.M{
@@ -435,7 +432,7 @@ func (r *resident) GetKecamatanByKabupaten(ctx context.Context, kabupatenName st
 					"nama_kecamatan": "$nama_kecamatan",
 					"nama_kelurahan": "$nama_kelurahan",
 				},
-				"count": bson.M{"$sum": 1}, // Jika ingin menghitung jumlah data
+				"count": bson.M{"$sum": 1},
 			},
 		},
 	}
@@ -457,7 +454,7 @@ func (r *resident) GetKecamatanByKabupaten(ctx context.Context, kabupatenName st
 			NamaKecamatan: result["_id"].(bson.M)["nama_kecamatan"].(string),
 			NamaKabupaten: result["_id"].(bson.M)["nama_kabupaten"].(string),
 			NamaKelurahan: result["_id"].(bson.M)["nama_kelurahan"].(string),
-			Count:         result["count"].(int32), // Jika menghitung jumlah data
+			Count:         result["count"].(int32),
 		}
 
 		dataKecamatanInKabupaten = append(dataKecamatanInKabupaten, groupedData)

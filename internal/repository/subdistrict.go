@@ -60,7 +60,6 @@ func (s *subdistrict) GetByDistrict(ctx context.Context, filter dto.GetByDistric
 		return nil, err
 	}
 
-	// Menggunakan sort.Strings untuk mengurutkan kelurahan dari awal ke akhir
 	sort.Strings(kelurahan)
 
 	return kelurahan, nil
