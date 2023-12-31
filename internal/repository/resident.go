@@ -6,7 +6,6 @@ import (
 	"betpsconnect/pkg/util"
 	"context"
 	"errors"
-	"fmt"
 	"regexp"
 	"time"
 
@@ -175,102 +174,6 @@ func (r *resident) GetTotalFilteredResidentCount(ctx context.Context, filter dto
 	}
 
 	return 0, nil
-}
-
-func (r *resident) GetAllResidents(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultResident, error) {
-	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
-	collectionName := "residents"
-
-	collection := r.MongoConn.Database(dbName).Collection(collectionName)
-	bsonFilter := bson.M{}
-	if filter.NamaKabupaten != "" {
-		bsonFilter["nama_kabupaten"] = filter.NamaKabupaten
-	}
-	if filter.NamaKecamatan != "" {
-		bsonFilter["nama_kecamatan"] = filter.NamaKecamatan
-	}
-	if filter.NamaKelurahan != "" {
-		bsonFilter["nama_kelurahan"] = filter.NamaKelurahan
-	}
-	if filter.TPS != "" {
-		bsonFilter["tps"] = filter.TPS
-	}
-	if filter.Nama != "" {
-		regex := primitive.Regex{Pattern: filter.Nama, Options: "i"}
-		bsonFilter["nama"] = regex
-	}
-
-	totalResults, err := collection.EstimatedDocumentCount(ctx)
-	if err != nil {
-		return dto.ResultResident{}, err
-	}
-
-	findOptions := options.Find().SetLimit(limit).SetSkip(offset)
-	cursor, err := collection.Find(ctx, bsonFilter, findOptions)
-	if err != nil {
-		return dto.ResultResident{}, err
-	}
-	defer cursor.Close(ctx)
-
-	var dataAllResident []dto.FindAllResident
-	for cursor.Next(ctx) {
-		var dresident model.Resident
-		if err := cursor.Decode(&dresident); err != nil {
-			return dto.ResultResident{}, err
-		}
-		age := dresident.Usia
-		if age == 0 {
-			dob, err := time.Parse("2006-01-02", dresident.TanggalLahir)
-			if err != nil {
-				fmt.Println(err)
-			}
-			now := time.Now()
-			age = now.Year() - dob.Year()
-			if now.YearDay() < dob.YearDay() {
-				age--
-			}
-		}
-
-		serverDTO := dto.FindAllResident{
-			ID:             dresident.ID,
-			Nama:           dresident.Nama,
-			Alamat:         dresident.Alamat,
-			JenisKelamin:   dresident.JenisKelamin,
-			Kawin:          dresident.Kawin,
-			NamaKabupaten:  dresident.NamaKabupaten,
-			NamaKecamatan:  dresident.NamaKecamatan,
-			NamaKelurahan:  dresident.NamaKelurahan,
-			Nik:            dresident.Nik,
-			Nkk:            dresident.Nkk,
-			NoKtp:          dresident.NoKtp,
-			Rt:             dresident.Rt,
-			Rw:             dresident.Rw,
-			Status:         dresident.Status,
-			StatusTpsLabel: dresident.StatusTpsLabel,
-			Tps:            dresident.Tps,
-			TanggalLahir:   dresident.TanggalLahir,
-			Usia:           age,
-		}
-
-		dataAllResident = append(dataAllResident, serverDTO)
-	}
-
-	if err := cursor.Err(); err != nil {
-		return dto.ResultResident{}, err
-	}
-
-	count := len(dataAllResident)
-
-	result := dto.ResultResident{
-		Items: dataAllResident,
-		Metadata: dto.MetaData{
-			TotalResults: int(totalResults),
-			Limit:        int(limit),
-			Offset:       int(offset),
-			Count:        count,
-		},
-	}
-	return result, nil
 }
 
 func (r *resident) DetailResident(ctx context.Context, ResidentID int) (dto.DetailResident, error) {
@@ -454,7 +357,8 @@ func (r *resident) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsBy
 	}
 	defer cursor.Close(ctx)
 
-	var results []string
+	var results []string // Inisialisasi slice kosong untuk hasil
+
 	if cursor.Next(ctx) {
 		var result struct {
 			TPS []string `bson:"tps"`
@@ -463,6 +367,11 @@ func (r *resident) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsBy
 			return nil, err
 		}
 		results = result.TPS
+	}
+
+	// Jika hasilnya kosong, kembalikan slice kosong
+	if len(results) == 0 {
+		return []string{}, nil
 	}
 
 	if err := cursor.Err(); err != nil {

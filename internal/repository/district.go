@@ -28,7 +28,6 @@ func NewDistrictRepository(mongoConn *mongo.Client) District {
 		MongoConn: mongoConn,
 	}
 }
-
 func (d *district) GetByCity(ctx context.Context, filter dto.GetByCity) ([]string, error) {
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collectionName := "districts"
@@ -64,6 +63,11 @@ func (d *district) GetByCity(ctx context.Context, filter dto.GetByCity) ([]strin
 
 	// Menggunakan sort.Strings untuk mengurutkan kecamatan dari awal ke akhir
 	sort.Strings(kecamatan)
+
+	// Jika data kosong, kembalikan slice kosong
+	if len(kecamatan) == 0 {
+		return []string{}, nil
+	}
 
 	return kecamatan, nil
 }

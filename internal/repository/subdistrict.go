@@ -62,6 +62,11 @@ func (s *subdistrict) GetByDistrict(ctx context.Context, filter dto.GetByDistric
 
 	sort.Strings(kelurahan)
 
+	// Jika data kosong, kembalikan slice kosong
+	if len(kelurahan) == 0 {
+		return []string{}, nil
+	}
+
 	return kelurahan, nil
 }
 

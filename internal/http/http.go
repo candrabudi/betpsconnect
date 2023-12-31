@@ -5,6 +5,7 @@ import (
 	District "betpsconnect/internal/app/district"
 	Resident "betpsconnect/internal/app/resident"
 	SubDistrict "betpsconnect/internal/app/subdistrict"
+	TrueResident "betpsconnect/internal/app/trueresident"
 	User "betpsconnect/internal/app/user"
 	"betpsconnect/internal/factory"
 	"betpsconnect/internal/middleware"
@@ -30,6 +31,7 @@ func NewHttp(g *gin.Engine, f *factory.Factory) {
 	SubDistrict.NewHandler(f).Router(v1.Group("/subdistrict"))
 	City.NewHandler(f).Router(v1.Group("/city"))
 	User.NewHandler(f).Router(v1.Group("/user"))
+	TrueResident.NewHandler(f).Router(v1.Group("/validresident"))
 
 }
 
