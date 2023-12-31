@@ -47,9 +47,18 @@ func (s *service) GetListResident(ctx context.Context, limit, offset int64, filt
 
 	resultTpsResidents, err := s.residentRepository.GetResidentTps(ctx, limit, offset, filter)
 	if err != nil {
-		return dto.ResultTpsResidents{}, err
+		return dto.ResultTpsResidents{
+			Items:    []dto.FindTpsResidents{},
+			Metadata: dto.MetaData{},
+		}, err
 	}
 
+	if len(resultTpsResidents.Items) == 0 {
+		return dto.ResultTpsResidents{
+			Items:    []dto.FindTpsResidents{},
+			Metadata: dto.MetaData{},
+		}, nil
+	}
 	return resultTpsResidents, nil
 }
 
