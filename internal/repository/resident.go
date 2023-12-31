@@ -41,6 +41,7 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 	collection := r.MongoConn.Database(dbName).Collection(collectionName)
 
 	bsonFilter := bson.M{}
+
 	if filter.NamaKabupaten != "" {
 		bsonFilter["nama_kabupaten"] = filter.NamaKabupaten
 	}
@@ -57,9 +58,7 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 		textFilter := bson.M{"$text": bson.M{"$search": filter.Nama}}
 		bsonFilter["$or"] = []bson.M{textFilter}
 	}
-	bsonFilter["status"] = "aktif"
 
-	// Fetching total count
 	totalResults, err := collection.CountDocuments(ctx, bsonFilter)
 	if err != nil {
 		return dto.ResultTpsResidents{}, err
@@ -108,6 +107,11 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 			Count:        count,
 		},
 	}
+
+	if totalResults == 0 {
+		result.Items = []dto.FindTpsResidents{}
+	}
+
 	return result, nil
 }
 
