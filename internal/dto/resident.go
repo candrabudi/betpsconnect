@@ -24,7 +24,7 @@ type (
 		Usia           int    `bson:"usia,omitempty" json:"usia"`
 		Tps            string `bson:"tps,omitempty" json:"tps"`
 		Status         string `bson:"status,omitempty" json:"status"`
-		IsVerification int    `bson:"is_verification,omitempty" json:"is_Verification"`
+		IsVerification int    `bson:"is_verification,omitempty" json:"is_verification"`
 	}
 
 	DetailResident struct {

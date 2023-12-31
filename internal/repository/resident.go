@@ -360,6 +360,20 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 	if len(duplicateData) == 0 {
 		return []int{}, nil
 	}
+
+	for _, idDuplicate := range duplicateData {
+		filterUpdate := bson.M{"id": idDuplicate}
+		update := bson.M{
+			"$set": bson.M{
+				"is_verification": 1,
+			},
+		}
+
+		_, err := collection.UpdateOne(ctx, filterUpdate, update)
+		if err != nil {
+			return duplicateData, err
+		}
+	}
 	return duplicateData, nil
 }
 
