@@ -318,7 +318,7 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 		}
 	}
 
-	return duplicateData, nil
+	return []int{}, nil
 }
 
 func (r *resident) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error) {

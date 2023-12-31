@@ -5,6 +5,7 @@ import (
 	"betpsconnect/internal/model"
 	"betpsconnect/pkg/util"
 	"context"
+	"errors"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -30,17 +31,19 @@ func (tr *trueresident) Store(ctx context.Context, newData dto.TrueResidentPaylo
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collection := tr.MongoConn.Database(dbName).Collection("true_residents")
 	trueFilter := bson.M{"nik": newData.Nik}
-	var mresident model.TrueResident
-	err := collection.FindOne(ctx, trueFilter).Decode(&mresident)
 
+	var existingResident model.TrueResident
+	err := collection.FindOne(ctx, trueFilter).Decode(&existingResident)
 	if err == nil {
-		return err
+		return errors.New("NIK already exists")
 	}
+
 	person, err := tr.getLastPerson(ctx, collection)
 	if err != nil {
 		return err
 	}
 	newUserID := person.ID + 1
+
 	TrueResident := model.TrueResident{
 		ID:          newUserID,
 		ResidentID:  0,
@@ -58,10 +61,12 @@ func (tr *trueresident) Store(ctx context.Context, newData dto.TrueResidentPaylo
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}
+
 	_, errInsert := collection.InsertOne(ctx, TrueResident)
 	if errInsert != nil {
 		return errInsert
 	}
+
 	return nil
 }
 
