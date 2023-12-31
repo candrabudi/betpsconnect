@@ -26,7 +26,7 @@ func (h *handler) GetDistrictByCity(c *gin.Context) {
 		NamaKecamatan: c.Query("nama_kecamatan"),
 	}
 
-	data, err := h.service.GetDistrictByCity(ctx, filter)
+	data, err := h.service.GetDistrictByCity(ctx, filter, c.Value("user"))
 	if err != nil {
 		response := util.APIResponse("Failed to retrieve district list: "+err.Error(), http.StatusInternalServerError, "failed", nil)
 		c.JSON(http.StatusInternalServerError, response)

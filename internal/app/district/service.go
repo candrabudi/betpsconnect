@@ -3,8 +3,10 @@ package district
 import (
 	"betpsconnect/internal/dto"
 	"betpsconnect/internal/factory"
+	"betpsconnect/internal/model"
 	"betpsconnect/internal/repository"
 	"context"
+	"errors"
 )
 
 type service struct {
@@ -12,7 +14,7 @@ type service struct {
 }
 
 type Service interface {
-	GetDistrictByCity(ctx context.Context, filter dto.GetByCity) ([]string, error)
+	GetDistrictByCity(ctx context.Context, filter dto.GetByCity, userSess any) ([]string, error)
 }
 
 func NewService(f *factory.Factory) Service {
@@ -21,7 +23,16 @@ func NewService(f *factory.Factory) Service {
 	}
 }
 
-func (s *service) GetDistrictByCity(ctx context.Context, filter dto.GetByCity) ([]string, error) {
+func (s *service) GetDistrictByCity(ctx context.Context, filter dto.GetByCity, userSess any) ([]string, error) {
+	user, ok := userSess.(model.User)
+	if !ok {
+		return []string{}, errors.New("invalid user session data")
+	}
+
+	if user.Role == "admin" {
+		filter.NamaKabupaten = user.Regency
+	}
+
 	resultDistrictByCity, err := s.districtRepository.GetByCity(ctx, filter)
 	if err != nil {
 		return nil, err
