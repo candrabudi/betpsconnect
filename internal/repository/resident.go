@@ -72,17 +72,16 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 
 	projectStage := bson.M{
 		"$project": bson.M{
-			"_id":            1,
-			"id":             1,
-			"nama":           1,
-			"jenis_kelamin":  1,
-			"nama_kecamatan": 1,
-			"tanggal_lahir":  1,
-			"tps":            1,
-			"nik":            1,
-			"status":         1,
-			"is_true":        1,
-			"is_false":       1,
+			"_id":             1,
+			"id":              1,
+			"nama":            1,
+			"jenis_kelamin":   1,
+			"nama_kecamatan":  1,
+			"tanggal_lahir":   1,
+			"tps":             1,
+			"nik":             1,
+			"status":          1,
+			"is_verification": 1,
 		},
 	}
 
@@ -317,7 +316,7 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 
 			update := bson.M{
 				"$set": bson.M{
-					"is_true": 1,
+					"is_verification": 1,
 				},
 			}
 			result, err := collection.UpdateOne(ctx, filterUpdate, update)
@@ -349,10 +348,6 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 			} else {
 				return duplicateData, errors.New("No data update resident.")
 			}
-		} else {
-			update = bson.D{{"$set", bson.D{
-				{"is_false", 1},
-			}}}
 		}
 
 		if len(update) > 0 {

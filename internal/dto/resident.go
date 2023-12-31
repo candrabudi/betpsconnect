@@ -38,18 +38,17 @@ type (
 		Tps            string `json:"tps"`
 	}
 	FindTpsResidents struct {
-		ID            int    `bson:"id,omitempty" json:"id"`
-		Nama          string `bson:"nama,omitempty" json:"nama"`
-		JenisKelamin  string `bson:"jenis_kelamin,omitempty" json:"jenis_kelamin"`
-		NamaKabupaten string `bson:"nama_kabupaten,omitempty" json:"nama_kabupaten"`
-		NamaKecamatan string `bson:"nama_kecamatan,omitempty" json:"nama_kecamatan"`
-		Nik           string `bson:"nik,omitempty" json:"nik"`
-		TanggalLahir  string `bson:"tanggal_lahir,omitempty" json:"tanggal_lahir"`
-		Usia          int    `bson:"usia,omitempty" json:"usia"`
-		Tps           string `bson:"tps,omitempty" json:"tps"`
-		Status        string `bson:"status,omitempty" json:"status"`
-		IsTrue        int    `bson:"is_true,omitempty" json:"is_true"`
-		IsFalse       int    `bson:"is_false,omitempty" json:"is_false"`
+		ID             int    `bson:"id,omitempty" json:"id"`
+		Nama           string `bson:"nama,omitempty" json:"nama"`
+		JenisKelamin   string `bson:"jenis_kelamin,omitempty" json:"jenis_kelamin"`
+		NamaKabupaten  string `bson:"nama_kabupaten,omitempty" json:"nama_kabupaten"`
+		NamaKecamatan  string `bson:"nama_kecamatan,omitempty" json:"nama_kecamatan"`
+		Nik            string `bson:"nik,omitempty" json:"nik"`
+		TanggalLahir   string `bson:"tanggal_lahir,omitempty" json:"tanggal_lahir"`
+		Usia           int    `bson:"usia,omitempty" json:"usia"`
+		Tps            string `bson:"tps,omitempty" json:"tps"`
+		Status         string `bson:"status,omitempty" json:"status"`
+		IsVerification int    `bson:"is_verification,omitempty" json:"is_Verification"`
 	}
 
 	DetailResident struct {
