@@ -5,10 +5,6 @@ type (
 		Items    []FindTpsResidents `json:"items"`
 		Metadata MetaData           `json:"metadata"`
 	}
-	ResultResident struct {
-		Items    []FindAllResident `json:"items"`
-		Metadata MetaData          `json:"metadata"`
-	}
 
 	MetaData struct {
 		TotalResults int `json:"total_results"`
@@ -16,27 +12,7 @@ type (
 		Offset       int `json:"offset"`
 		Count        int `json:"count"`
 	}
-	FindAllResident struct {
-		ID             int    `json:"id"`
-		Nama           string `json:"nama"`
-		Alamat         string `json:"alamat"`
-		JenisKelamin   string `json:"jenis_kelamin"`
-		Kawin          string `json:"kawin"`
-		NamaKabupaten  string `json:"nama_kabupaten"`
-		NamaKecamatan  string `json:"nama_kecamatan"`
-		NamaKelurahan  string `json:"nama_kelurahan"`
-		Nik            string `json:"nik"`
-		Nkk            string `json:"nkk"`
-		NoKtp          string `json:"no_ktp"`
-		Rt             string `json:"rt"`
-		Rw             string `json:"rw"`
-		Status         string `json:"status"`
-		TanggalLahir   string `json:"tanggal_lahir"`
-		StatusTpsLabel string `json:"status_tps_label"`
-		Usia           int    `json:"usia"`
-		Telp           string `json:"telp"`
-		Tps            string `json:"tps"`
-	}
+
 	FindTpsResidents struct {
 		ID             int    `bson:"id,omitempty" json:"id"`
 		Nama           string `bson:"nama,omitempty" json:"nama"`

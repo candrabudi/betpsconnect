@@ -8,5 +8,6 @@ import (
 
 func (h *handler) Router(g *gin.RouterGroup) {
 	g.Use(middleware.Authenticate())
+	g.GET("/list", h.GetTrueResidents)
 	g.POST("/store", h.Store)
 }
