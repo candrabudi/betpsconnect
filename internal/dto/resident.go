@@ -38,14 +38,15 @@ type (
 		Tps            string `json:"tps"`
 	}
 	FindTpsResidents struct {
-		ID            int    `json:"id"`
-		Nama          string `json:"nama"`
-		JenisKelamin  string `json:"jenis_kelamin"`
-		NamaKecamatan string `json:"nama_kecamatan"`
-		Nik           string `json:"nik"`
-		Status        string `json:"status"`
-		IsTrue        int    `json:"is_true"`
-		IsFalse       int    `json:"is_false"`
+		ID            int    `bson:"id,omitempty" json:"id"`
+		Nama          string `bson:"nama,omitempty" json:"nama"`
+		JenisKelamin  string `bson:"jenis_kelamin,omitempty" json:"jenis_kelamin"`
+		NamaKabupaten string `bson:"nama_kabupaten,omitempty" json:"nama_kabupaten"`
+		NamaKecamatan string `bson:"nama_kecamatan,omitempty" json:"nama_kecamatan"`
+		Nik           string `bson:"nik,omitempty" json:"nik"`
+		Status        string `bson:"status,omitempty" json:"status"`
+		IsTrue        int    `bson:"is_true,omitempty" json:"is_true"`
+		IsFalse       int    `bson:"is_false,omitempty" json:"is_false"`
 	}
 
 	DetailResident struct {

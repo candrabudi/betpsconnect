@@ -7,6 +7,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"regexp"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -40,63 +41,68 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 
 	collection := r.MongoConn.Database(dbName).Collection(collectionName)
 
-	bsonFilter := bson.M{}
+	pipeline := []bson.M{}
+
+	matchStage := bson.M{}
 
 	if filter.NamaKabupaten != "" {
-		bsonFilter["nama_kabupaten"] = filter.NamaKabupaten
+		matchStage["nama_kabupaten"] = filter.NamaKabupaten
 	}
+
 	if filter.NamaKecamatan != "" {
-		bsonFilter["nama_kecamatan"] = filter.NamaKecamatan
+		matchStage["nama_kecamatan"] = filter.NamaKecamatan
 	}
+
 	if filter.NamaKelurahan != "" {
-		bsonFilter["nama_kelurahan"] = filter.NamaKelurahan
+		matchStage["nama_kelurahan"] = filter.NamaKelurahan
 	}
+
 	if filter.TPS != "" {
-		bsonFilter["tps"] = filter.TPS
+		matchStage["tps"] = filter.TPS
 	}
+
 	if filter.Nama != "" {
-		textFilter := bson.M{"$text": bson.M{"$search": filter.Nama}}
-		bsonFilter["$or"] = []bson.M{textFilter}
+		regexPattern := regexp.QuoteMeta(filter.Nama)
+		matchStage["$or"] = []bson.M{{"nama": primitive.Regex{Pattern: regexPattern, Options: "i"}}}
 	}
 
-	totalResults, err := collection.CountDocuments(ctx, bsonFilter)
-	if err != nil {
-		return dto.ResultTpsResidents{}, err
+	if len(matchStage) > 0 {
+		pipeline = append(pipeline, bson.M{"$match": matchStage})
 	}
 
-	// Fetching paginated data
-	findOptions := options.Find().SetLimit(limit).SetSkip(offset)
-	cursor, err := collection.Find(ctx, bsonFilter, findOptions)
+	projectStage := bson.M{
+		"$project": bson.M{
+			"_id":            1,
+			"id":             1,
+			"nama":           1,
+			"jenis_kelamin":  1,
+			"nama_kabupaten": 1,
+			"nama_kecamatan": 1,
+			"nik":            1,
+			"status":         1,
+			"is_true":        1,
+			"is_false":       1,
+		},
+	}
+
+	pipeline = append(pipeline, projectStage)
+
+	// Adding pagination
+	pipeline = append(pipeline, bson.M{"$skip": offset})
+	pipeline = append(pipeline, bson.M{"$limit": limit})
+
+	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
 		return dto.ResultTpsResidents{}, err
 	}
 	defer cursor.Close(ctx)
 
 	var dataAllResident []dto.FindTpsResidents
-	for cursor.Next(ctx) {
-		var dresident model.Resident
-		if err := cursor.Decode(&dresident); err != nil {
-			return dto.ResultTpsResidents{}, err
-		}
-
-		serverDTO := dto.FindTpsResidents{
-			ID:           dresident.ID,
-			Nama:         dresident.Nama,
-			JenisKelamin: dresident.JenisKelamin,
-			Nik:          dresident.Nik,
-			Status:       dresident.Status,
-			IsTrue:       dresident.IsTrue,
-			IsFalse:      dresident.IsFalse,
-		}
-
-		dataAllResident = append(dataAllResident, serverDTO)
-	}
-
-	if err := cursor.Err(); err != nil {
+	if err = cursor.All(ctx, &dataAllResident); err != nil {
 		return dto.ResultTpsResidents{}, err
 	}
 
-	count := len(dataAllResident)
+	totalResults := int64(len(dataAllResident))
 
 	result := dto.ResultTpsResidents{
 		Items: dataAllResident,
@@ -104,7 +110,7 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 			TotalResults: int(totalResults),
 			Limit:        int(limit),
 			Offset:       int(offset),
-			Count:        count,
+			Count:        len(dataAllResident),
 		},
 	}
 
