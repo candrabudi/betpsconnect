@@ -102,7 +102,12 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 		return dto.ResultTpsResidents{}, err
 	}
 
-	totalResults := int64(len(dataAllResident))
+	totalResults, err := r.GetTotalFilteredResidentCount(ctx, filter)
+	if err != nil {
+		return dto.ResultTpsResidents{}, err
+	}
+
+	// totalResults := int64(len(dataAllResident))
 
 	result := dto.ResultTpsResidents{
 		Items: dataAllResident,
@@ -119,6 +124,71 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 	}
 
 	return result, nil
+}
+
+func (r *resident) GetTotalFilteredResidentCount(ctx context.Context, filter dto.ResidentFilter) (int32, error) {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "residents"
+
+	collection := r.MongoConn.Database(dbName).Collection(collectionName)
+
+	pipeline := []bson.M{}
+
+	matchStage := bson.M{}
+
+	if filter.NamaKabupaten != "" {
+		matchStage["nama_kabupaten"] = filter.NamaKabupaten
+	}
+
+	if filter.NamaKecamatan != "" {
+		matchStage["nama_kecamatan"] = filter.NamaKecamatan
+	}
+
+	if filter.NamaKelurahan != "" {
+		matchStage["nama_kelurahan"] = filter.NamaKelurahan
+	}
+
+	if filter.TPS != "" {
+		matchStage["tps"] = filter.TPS
+	}
+
+	if filter.Nama != "" {
+		regexPattern := regexp.QuoteMeta(filter.Nama)
+		matchStage["$or"] = []bson.M{{"nama": primitive.Regex{Pattern: regexPattern, Options: "i"}}}
+	}
+
+	if len(matchStage) > 0 {
+		pipeline = append(pipeline, bson.M{"$match": matchStage})
+	}
+
+	groupStage := bson.M{
+		"$group": bson.M{
+			"_id": nil,
+			"count": bson.M{
+				"$sum": 1,
+			},
+		},
+	}
+
+	pipeline = append(pipeline, groupStage)
+
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return 0, err
+	}
+	defer cursor.Close(ctx)
+
+	var result []bson.M
+	if err = cursor.All(ctx, &result); err != nil {
+		return 0, err
+	}
+
+	if len(result) > 0 {
+		total := result[0]["count"].(int32)
+		return total, nil
+	}
+
+	return 0, nil
 }
 
 func (r *resident) GetAllResidents(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultResident, error) {
