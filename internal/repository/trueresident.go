@@ -44,6 +44,7 @@ func (tr *trueresident) GetAll(ctx context.Context, limit, offset int64, filter 
 	matchStage := bson.M{}
 
 	if filter.NamaKabupaten != "" {
+		fmt.Println(filter.NamaKabupaten)
 		matchStage["city"] = filter.NamaKabupaten
 	}
 
@@ -143,15 +144,15 @@ func (tr *trueresident) GetTotalFilteredResidentCount(ctx context.Context, filte
 	filterOptions := bson.M{}
 
 	if filter.NamaKabupaten != "" {
-		filterOptions["nama_kabupaten"] = filter.NamaKabupaten
+		filterOptions["city"] = filter.NamaKabupaten
 	}
 
 	if filter.NamaKecamatan != "" {
-		filterOptions["nama_kecamatan"] = filter.NamaKecamatan
+		filterOptions["district"] = filter.NamaKecamatan
 	}
 
 	if filter.NamaKelurahan != "" {
-		filterOptions["nama_kelurahan"] = filter.NamaKelurahan
+		filterOptions["subdistrict"] = filter.NamaKelurahan
 	}
 
 	if filter.TPS != "" {

@@ -24,8 +24,8 @@ type (
 		NamaKecamatan string `json:"nama_kecamatan"`
 		NamaKelurahan string `json:"nama_kelurahan"`
 		TPS           string `json:"tps"`
-		IsManual      string `json:"is_manual"`
 		Nama          string `json:"nama"`
+		IsManual      string `json:"is_manual"`
 	}
 
 	FindTrueAllResident struct {
