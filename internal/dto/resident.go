@@ -52,6 +52,7 @@ type (
 		Kawin          string `bson:"kawin,omitempty" json:"kawin"`
 		RT             string `bson:"rt,omitempty" json:"rt"`
 		RW             string `bson:"rw,omitempty" json:"rw"`
+		Alamat         string `bson:"alamat,omitempty" json:"alamat"`
 	}
 
 	DetailResident struct {

@@ -190,6 +190,7 @@ func (r *resident) GetListValidate(ctx context.Context, limit, offset int64, fil
 			"kawin":            1,
 			"rt":               1,
 			"rw":               1,
+			"alamat":           1,
 		},
 	}
 
@@ -473,7 +474,7 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 				TrueResident := model.TrueResident{
 					ID:          newUserID,
 					FullName:    dresident.Nama,
-					Address:     "RT " + dresident.Rt + "/ RW " + dresident.Rw + ", " + dresident.NamaKelurahan + ", " + dresident.NamaKecamatan + ", " + dresident.NamaKabupaten,
+					Address:     dresident.Alamat,
 					Nik:         dresident.Nik,
 					NoHandphone: dataResident.NoHandphone,
 					Age:         age,
