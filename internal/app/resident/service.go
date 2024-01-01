@@ -19,6 +19,7 @@ type service struct {
 
 type Service interface {
 	GetListResident(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultTpsResidents, error)
+	GetValidateResident(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultValidateResidents, error)
 	DetailResident(ctx context.Context, ResidentID int) (dto.DetailResident, error)
 	CheckResidentByNik(ctx context.Context, Nik string) (dto.DetailResident, error)
 	GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error)
@@ -60,6 +61,33 @@ func (s *service) GetListResident(ctx context.Context, limit, offset int64, filt
 		}, nil
 	}
 	return resultTpsResidents, nil
+}
+
+func (s *service) GetValidateResident(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultValidateResidents, error) {
+	user, ok := userSess.(model.User)
+	if !ok {
+		return dto.ResultValidateResidents{}, errors.New("invalid user session data")
+	}
+
+	if user.Role == "admin" {
+		filter.NamaKabupaten = user.Regency
+	}
+
+	resultValidateResidents, err := s.residentRepository.GetListValidate(ctx, limit, offset, filter)
+	if err != nil {
+		return dto.ResultValidateResidents{
+			Items:    []dto.FindValidateResidents{},
+			Metadata: dto.MetaData{},
+		}, err
+	}
+
+	if len(resultValidateResidents.Items) == 0 {
+		return dto.ResultValidateResidents{
+			Items:    []dto.FindValidateResidents{},
+			Metadata: dto.MetaData{},
+		}, nil
+	}
+	return resultValidateResidents, nil
 }
 
 func (s *service) DetailResident(ctx context.Context, ResidentID int) (dto.DetailResident, error) {

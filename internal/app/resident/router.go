@@ -9,6 +9,7 @@ import (
 func (h *handler) Router(g *gin.RouterGroup) {
 	g.Use(middleware.Authenticate())
 	g.GET("/list", h.GetResidents)
+	g.GET("/validate/list", h.GetValidateResidents)
 	g.GET("/list/groupby", h.GetGroupBy)
 	g.GET("/detail/:resident_id", h.DetailResident)
 	g.GET("/by-nik", h.CheckResidentByNik)

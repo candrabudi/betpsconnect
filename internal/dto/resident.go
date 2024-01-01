@@ -6,6 +6,11 @@ type (
 		Metadata MetaData           `json:"metadata"`
 	}
 
+	ResultValidateResidents struct {
+		Items    []FindValidateResidents `json:"items"`
+		Metadata MetaData                `json:"metadata"`
+	}
+
 	MetaData struct {
 		TotalResults int `json:"total_results"`
 		Limit        int `json:"limit"`
@@ -25,6 +30,28 @@ type (
 		Tps            string `bson:"tps,omitempty" json:"tps"`
 		Status         string `bson:"status,omitempty" json:"status"`
 		IsVerification int    `bson:"is_verification,omitempty" json:"is_verification"`
+	}
+
+	FindValidateResidents struct {
+		ID             int    `bson:"id,omitempty" json:"id"`
+		Nama           string `bson:"nama,omitempty" json:"nama"`
+		JenisKelamin   string `bson:"jenis_kelamin,omitempty" json:"jenis_kelamin"`
+		NamaKabupaten  string `bson:"nama_kabupaten,omitempty" json:"nama_kabupaten"`
+		NamaKecamatan  string `bson:"nama_kecamatan,omitempty" json:"nama_kecamatan"`
+		Nik            string `bson:"nik,omitempty" json:"nik"`
+		TanggalLahir   string `bson:"tanggal_lahir,omitempty" json:"tanggal_lahir"`
+		Usia           int    `bson:"usia,omitempty" json:"usia"`
+		TPS            string `bson:"tps,omitempty" json:"tps"`
+		Status         string `bson:"status,omitempty" json:"status"`
+		IsVerification int    `bson:"is_verification,omitempty" json:"is_verification"`
+		StatusTPSLabel string `bson:"status_tps_label,omitempty" json:"status_tps_label"`
+		TempatLahir    string `bson:"tempat_lahir,omitempty" json:"tempat_lahir"`
+		Telp           string `bson:"telp,omitempty" json:"telp"`
+		NoKTP          string `bson:"no_ktp,omitempty" json:"no_ktp"`
+		Difabel        string `bson:"difabel,omitempty" json:"difabel"`
+		Kawin          string `bson:"kawin,omitempty" json:"kawin"`
+		RT             string `bson:"rt,omitempty" json:"rt"`
+		RW             string `bson:"rw,omitempty" json:"rw"`
 	}
 
 	DetailResident struct {
