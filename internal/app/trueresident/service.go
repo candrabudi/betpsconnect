@@ -38,7 +38,6 @@ func (s *service) GetAll(ctx context.Context, limit, offset int64, filter dto.Tr
 	if err != nil {
 		return dto.ResultAllTrueResident{}, err
 	}
-
 	return resultTpsResidents, nil
 }
 

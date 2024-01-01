@@ -38,13 +38,11 @@ func (tr *trueresident) GetAll(ctx context.Context, limit, offset int64, filter 
 	collectionName := "true_residents"
 
 	collection := tr.MongoConn.Database(dbName).Collection(collectionName)
-
 	pipeline := []bson.M{}
 
 	matchStage := bson.M{}
 
 	if filter.NamaKabupaten != "" {
-		fmt.Println(filter.NamaKabupaten)
 		matchStage["city"] = filter.NamaKabupaten
 	}
 
@@ -62,16 +60,14 @@ func (tr *trueresident) GetAll(ctx context.Context, limit, offset int64, filter 
 
 	if filter.IsManual != "" {
 		isManualInt, err := strconv.Atoi(filter.IsManual)
-		if err != nil {
-			fmt.Println("Failed to convert IsManual to int:", err)
-		} else {
+		if err == nil {
 			matchStage["is_manual"] = isManualInt
 		}
 	}
 
 	if filter.Nama != "" {
 		regexPattern := regexp.QuoteMeta(filter.Nama)
-		matchStage["$or"] = []bson.M{{"full_name": primitive.Regex{Pattern: regexPattern, Options: "i"}}}
+		matchStage["full_name"] = primitive.Regex{Pattern: regexPattern, Options: "i"}
 	}
 
 	if len(matchStage) > 0 {
@@ -170,7 +166,7 @@ func (tr *trueresident) GetTotalFilteredResidentCount(ctx context.Context, filte
 
 	if filter.Nama != "" {
 		regexPattern := regexp.QuoteMeta(filter.Nama)
-		filterOptions["$or"] = []bson.M{{"nama": primitive.Regex{Pattern: regexPattern, Options: "i"}}}
+		filterOptions["$or"] = []bson.M{{"full_name": primitive.Regex{Pattern: regexPattern, Options: "i"}}}
 	}
 
 	countQuery := []bson.M{
