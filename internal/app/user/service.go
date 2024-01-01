@@ -18,6 +18,7 @@ type service struct {
 
 type Service interface {
 	LoginUser(ctx context.Context, payload dto.PayloadLogin) (dto.ResultLogin, error)
+	Logout(ctx context.Context, bearerStr string) error
 }
 
 func NewService(f *factory.Factory) Service {
@@ -57,4 +58,14 @@ func (s *service) LoginUser(ctx context.Context, payload dto.PayloadLogin) (dto.
 		Token:    token,
 	}
 	return resultLogin, nil
+}
+
+func (s *service) Logout(ctx context.Context, bearerStr string) error {
+
+	err := s.userRepository.Logout(bearerStr)
+
+	if err != nil {
+		return err
+	}
+	return nil
 }

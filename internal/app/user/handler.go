@@ -7,6 +7,7 @@ import (
 	"betpsconnect/pkg/util"
 	"io"
 	"net/http"
+	"regexp"
 
 	"github.com/gin-gonic/gin"
 )
@@ -43,5 +44,21 @@ func (h *handler) LoginUser(c *gin.Context) {
 	}
 
 	response := util.APIResponse("Success login user", http.StatusOK, "success", resultLogin)
+	c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) LogoutUser(c *gin.Context) {
+	header := c.Request.Header["Authorization"]
+	rep := regexp.MustCompile(`(Bearer)\s?`)
+	bearerStr := rep.ReplaceAllString(header[0], "")
+	err := h.service.Logout(c, bearerStr)
+
+	if err == constants.UserNotFound {
+		response := util.APIResponse(err.Error(), http.StatusBadRequest, "failed", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := util.APIResponse("Success login user", http.StatusOK, "success", nil)
 	c.JSON(http.StatusOK, response)
 }

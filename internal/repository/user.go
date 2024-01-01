@@ -5,6 +5,7 @@ import (
 	"betpsconnect/internal/model"
 	"betpsconnect/pkg/util"
 	"context"
+	"fmt"
 	"strconv"
 	"time"
 
@@ -16,6 +17,7 @@ import (
 
 type User interface {
 	LoginUser(ctx context.Context, email, password string) (string, error)
+	Logout(token string) error
 	FindOneByEmail(ctx context.Context, email string) (dto.FindOneUser, error)
 	FindOne(ctx context.Context, UserID int) (model.User, error)
 }
@@ -90,6 +92,23 @@ func (u *user) GenerateToken(secretKey []byte, userID string, email string) (str
 	}
 
 	return tokenString, nil
+}
+
+func (u *user) Logout(token string) error {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "user_tokens"
+
+	collection := u.MongoConn.Database(dbName).Collection(collectionName)
+
+	filter := bson.M{"token": token}
+
+	_, err := collection.DeleteOne(context.TODO(), filter)
+	if err != nil {
+		fmt.Println("Error deleting token:", err)
+		return err
+	}
+
+	return nil
 }
 
 func (u *user) FindOneByEmail(ctx context.Context, email string) (dto.FindOneUser, error) {

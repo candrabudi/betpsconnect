@@ -6,4 +6,5 @@ import (
 
 func (h *handler) Router(g *gin.RouterGroup) {
 	g.POST("/login", h.LoginUser)
+	g.POST("/logout", h.LogoutUser)
 }
