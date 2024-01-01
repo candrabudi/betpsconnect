@@ -80,8 +80,13 @@ type (
 	}
 
 	PayloadUpdateValidInvalid struct {
-		ResidentID []int `json:"resident_id" binding:"required"`
-		IsTrue     bool  `json:"is_true"`
+		IsTrue bool                          `json:"is_true", binding:"required"`
+		Items  []PayloadBulkValidateResident `json:"items", binding:"required"`
+	}
+
+	PayloadBulkValidateResident struct {
+		ID          int    `json:"id", binding:"required"`
+		NoHandphone string `json:"no_handphone", binding:"required"`
 	}
 
 	ResultsDuplicateUpdateResident struct {

@@ -86,8 +86,8 @@ func (s *service) residentValidate(ctx context.Context, updatePayload dto.Payloa
 	}
 
 	payload := dto.PayloadUpdateValidInvalid{
-		ResidentID: updatePayload.ResidentID,
-		IsTrue:     updatePayload.IsTrue,
+		Items:  updatePayload.Items,
+		IsTrue: updatePayload.IsTrue,
 	}
 
 	results, err := s.residentRepository.ResidentValidate(ctx, payload)

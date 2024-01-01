@@ -189,18 +189,16 @@ func (tr *trueresident) Store(ctx context.Context, newData dto.TrueResidentPaylo
 
 	TrueResident := model.TrueResident{
 		ID:          newUserID,
-		ResidentID:  0,
 		FullName:    newData.FullName,
 		Nik:         newData.Nik,
 		NoHandphone: newData.NoHandphone,
 		Age:         newData.Age,
 		Gender:      newData.Gender,
-		BirthDate:   "",
-		BirthPlace:  "",
 		City:        newData.City,
 		District:    newData.District,
 		SubDistrict: newData.Subdistrict,
 		Tps:         newData.TPS,
+		IsManual:    1,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
 	}

@@ -294,14 +294,19 @@ func (r *resident) Store(ctx context.Context, data model.Resident) error {
 func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpdateValidInvalid) ([]int, error) {
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collection := r.MongoConn.Database(dbName).Collection("residents")
-	var duplicateData []int // To store duplicate data
+	var duplicateData []int
 
-	for _, residentID := range newData.ResidentID {
-		filter := bson.D{{"id", residentID}}
+	for _, dataResident := range newData.Items {
+		filter := bson.D{
+			{"$and", bson.A{
+				bson.D{{"id", dataResident.ID}},
+				bson.D{{"is_verification", 0}},
+			}},
+		}
 
 		update := bson.D{}
 		if newData.IsTrue == true {
-			dresident, err := r.DetailResident(ctx, residentID)
+			dresident, err := r.DetailResident(ctx, dataResident.ID)
 			if err != nil {
 				return duplicateData, err
 			}
@@ -312,7 +317,7 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 			err = trueResidentCollection.FindOne(ctx, trueFilter).Decode(&mresident)
 
 			if err == nil {
-				duplicateData = append(duplicateData, residentID)
+				duplicateData = append(duplicateData, dataResident.ID)
 				continue
 			}
 
@@ -333,20 +338,20 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 				return duplicateData, err
 			}
 			if result.ModifiedCount > 0 {
+				birthDate, _ := time.Parse("2006-01-02", dresident.TanggalLahir)
+				age := r.calculateAge(birthDate)
 				TrueResident := model.TrueResident{
 					ID:          newUserID,
-					ResidentID:  residentID,
 					FullName:    dresident.Nama,
 					Nik:         dresident.Nik,
-					NoHandphone: dresident.Telp,
-					Age:         dresident.Usia,
+					NoHandphone: dataResident.NoHandphone,
+					Age:         age,
 					Gender:      dresident.JenisKelamin,
-					BirthDate:   dresident.TanggalLahir,
-					BirthPlace:  dresident.TempatLahir,
 					City:        dresident.NamaKabupaten,
 					District:    dresident.NamaKecamatan,
 					SubDistrict: dresident.NamaKelurahan,
 					Tps:         dresident.Tps,
+					IsManual:    0,
 					CreatedAt:   time.Now(),
 					UpdatedAt:   time.Now(),
 				}
@@ -370,6 +375,17 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 		return []int{}, nil
 	}
 	return duplicateData, nil
+}
+
+func (r *resident) calculateAge(TanggalLahir time.Time) int {
+	waktuSekarang := time.Now()
+	usia := waktuSekarang.Year() - TanggalLahir.Year()
+
+	// Koreksi jika belum ulang tahun pada tahun ini
+	if waktuSekarang.Month() < TanggalLahir.Month() || (waktuSekarang.Month() == TanggalLahir.Month() && waktuSekarang.Day() < TanggalLahir.Day()) {
+		usia--
+	}
+	return usia
 }
 
 func (r *resident) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error) {
