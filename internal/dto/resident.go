@@ -57,31 +57,31 @@ type (
 	}
 
 	DetailResident struct {
-		ID             int    `json:"id"`
-		Nama           string `json:"nama"`
-		Alamat         string `json:"alamat"`
-		Difabel        string `json:"difabel"`
-		Ektp           string `json:"ektp"`
-		Email          string `json:"email"`
-		JenisKelamin   string `json:"jenis_kelamin"`
-		Kawin          string `json:"kawin"`
-		NamaKabupaten  string `json:"nama_kabupaten"`
-		NamaKecamatan  string `json:"nama_kecamatan"`
-		NamaKelurahan  string `json:"nama_kelurahan"`
-		Nik            string `json:"nik"`
-		Nkk            string `json:"nkk"`
-		NoKtp          string `json:"no_ktp"`
-		Rt             string `json:"rt"`
-		Rw             string `json:"rw"`
-		SaringanID     string `json:"saringan_id"`
-		Status         string `json:"status"`
-		StatusTpsLabel string `json:"status_tps_label"`
-		TanggalLahir   string `json:"tanggal_lahir"`
-		Usia           int    `json:"usia"`
-		TempatLahir    string `json:"tampat_lahir"`
-		Telp           string `json:"telp"`
-		Tps            string `json:"tps"`
-		IsVerification int    `json:"is_verification"`
+		ID             int    `json:"id" bson:"id"`
+		Nama           string `json:"nama" bson:"nama"`
+		Alamat         string `json:"alamat" bson:"alamat"`
+		Difabel        string `json:"difabel" bson:"difabel"`
+		Ektp           string `json:"ektp" bson:"ektp"`
+		Email          string `json:"email" bson:"email"`
+		JenisKelamin   string `json:"jenis_kelamin" bson:"jenis_kelamin"`
+		Kawin          string `json:"kawin" bson:"kawin"`
+		NamaKabupaten  string `json:"nama_kabupaten" bson:"nama_kabupaten"`
+		NamaKecamatan  string `json:"nama_kecamatan" bson:"nama_kecamatan"`
+		NamaKelurahan  string `json:"nama_kelurahan" bson:"nama_kelurahan"`
+		Nik            string `json:"nik" bson:"nik"`
+		Nkk            string `json:"nkk" bson:"nkk"`
+		NoKtp          string `json:"no_ktp" bson:"no_ktp"`
+		Rt             string `json:"rt" bson:"rt"`
+		Rw             string `json:"rw" bson:"rw"`
+		SaringanID     string `json:"saringan_id" bson:"saringan_id"`
+		Status         string `json:"status" bson:"status"`
+		StatusTpsLabel string `json:"status_tps_label" bson:"status_tps_label"`
+		TanggalLahir   string `json:"tanggal_lahir" bson:"tanggal_lahir"`
+		Usia           int    `json:"usia" bson:"usia"`
+		TempatLahir    string `json:"tempat_lahir" bson:"tempat_lahir"`
+		Telp           string `json:"telp" bson:"telp"`
+		Tps            string `json:"tps" bson:"tps"`
+		IsVerification int    `json:"is_verification" bson:"is_verification"`
 	}
 
 	ResidentFilter struct {

@@ -299,42 +299,62 @@ func (r *resident) DetailResident(ctx context.Context, ResidentID int) (dto.Deta
 	collectionName := "residents"
 
 	collection := r.MongoConn.Database(dbName).Collection(collectionName)
-	bsonFilter := bson.M{}
-	bsonFilter["id"] = ResidentID
-	var dresident model.Resident
-	err := collection.FindOne(ctx, bsonFilter).Decode(&dresident)
+	pipeline := make([]bson.M, 0)
+
+	matchStage := bson.M{
+		"$match": bson.M{
+			"id": ResidentID,
+		},
+	}
+	pipeline = append(pipeline, matchStage)
+
+	projectStage := bson.M{
+		"$project": bson.M{
+			"_id":              1,
+			"id":               1,
+			"nama":             1,
+			"jenis_kelamin":    1,
+			"nama_kecamatan":   1,
+			"nama_kabupaten":   1,
+			"nama_kelurahan":   1,
+			"email":            1,
+			"ektp":             1,
+			"saringan_id":      1,
+			"tanggal_lahir":    1,
+			"tps":              1,
+			"nik":              1,
+			"nkk":              1,
+			"status":           1,
+			"is_verification":  1,
+			"status_tps_label": 1,
+			"tempat_lahir":     1,
+			"telp":             1,
+			"no_ktp":           1,
+			"difabel":          1,
+			"kawin":            1,
+			"rt":               1,
+			"rw":               1,
+			"alamat":           1,
+		},
+	}
+	pipeline = append(pipeline, projectStage)
+
+	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
 		return dto.DetailResident{}, err
 	}
-	residentDTO := dto.DetailResident{
-		ID:             dresident.ID,
-		Nama:           dresident.Nama,
-		Alamat:         dresident.Alamat,
-		Difabel:        dresident.Difabel,
-		Ektp:           dresident.Ektp,
-		Email:          dresident.Email,
-		JenisKelamin:   dresident.JenisKelamin,
-		Kawin:          dresident.Kawin,
-		NamaKabupaten:  dresident.NamaKabupaten,
-		NamaKecamatan:  dresident.NamaKecamatan,
-		NamaKelurahan:  dresident.NamaKelurahan,
-		Nik:            dresident.Nik,
-		Nkk:            dresident.Nkk,
-		NoKtp:          dresident.NoKtp,
-		Rt:             dresident.Rt,
-		Rw:             dresident.Rw,
-		SaringanID:     dresident.SaringanID,
-		Status:         dresident.Status,
-		StatusTpsLabel: dresident.StatusTpsLabel,
-		TanggalLahir:   dresident.TanggalLahir,
-		Usia:           dresident.Usia,
-		TempatLahir:    dresident.TempatLahir,
-		Telp:           dresident.Telp,
-		Tps:            dresident.Tps,
-		IsVerification: dresident.IsVerification,
+	defer cursor.Close(ctx)
+
+	var dataResident dto.DetailResident
+	if cursor.Next(ctx) {
+		if err := cursor.Decode(&dataResident); err != nil {
+			return dto.DetailResident{}, err
+		}
+	} else {
+		return dto.DetailResident{}, errors.New("Resident not found")
 	}
 
-	return residentDTO, nil
+	return dataResident, nil
 }
 
 func (r *resident) CheckResidentByNik(ctx context.Context, Nik string) (dto.DetailResident, error) {
