@@ -48,6 +48,7 @@ type (
 		TempatLahir    string `bson:"tempat_lahir,omitempty" json:"tempat_lahir"`
 		Telp           string `bson:"telp,omitempty" json:"telp"`
 		NoKTP          string `bson:"no_ktp,omitempty" json:"no_ktp"`
+		Nkk            string `bson:"nkk,omitempty" json:"nkk"`
 		Difabel        string `bson:"difabel,omitempty" json:"difabel"`
 		Kawin          string `bson:"kawin,omitempty" json:"kawin"`
 		RT             string `bson:"rt,omitempty" json:"rt"`

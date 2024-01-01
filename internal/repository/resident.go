@@ -180,6 +180,7 @@ func (r *resident) GetListValidate(ctx context.Context, limit, offset int64, fil
 			"tanggal_lahir":    1,
 			"tps":              1,
 			"nik":              1,
+			"nkk":              1,
 			"status":           1,
 			"is_verification":  1,
 			"status_tps_label": 1,
