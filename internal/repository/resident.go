@@ -65,6 +65,7 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 		regexPattern := regexp.QuoteMeta(filter.Nama)
 		matchStage["$or"] = []bson.M{{"nama": primitive.Regex{Pattern: regexPattern, Options: "i"}}}
 	}
+	matchStage["is_deleted"] = 0
 
 	if len(matchStage) > 0 {
 		pipeline = append(pipeline, bson.M{"$match": matchStage})
@@ -160,7 +161,7 @@ func (r *resident) GetTotalFilteredResidentCount(ctx context.Context, filter dto
 		regexPattern := regexp.QuoteMeta(filter.Nama)
 		filterOptions["$or"] = []bson.M{{"nama": primitive.Regex{Pattern: regexPattern, Options: "i"}}}
 	}
-
+	filterOptions["is_deleted"] = 0
 	countQuery := []bson.M{
 		{"$match": filterOptions},
 		{"$count": "total"},
