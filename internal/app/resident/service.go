@@ -141,19 +141,17 @@ func (s *service) GetListResidentGroup(ctx context.Context) error {
 }
 
 func (s *service) Store(ctx context.Context, payload dto.PayloadStoreResident) error {
-	dataStore := model.Resident{
-		Nama:          payload.Nama,
-		Alamat:        payload.Alamat,
-		JenisKelamin:  payload.JenisKelamin,
-		NamaKabupaten: payload.NamaKabupaten,
-		NamaKecamatan: payload.NamaKecamatan,
-		NamaKelurahan: payload.NamaKelurahan,
-		Nik:           payload.Nik,
-		Rt:            payload.Rt,
-		Rw:            payload.Rw,
-		Usia:          payload.Usia,
-		Telp:          payload.Telp,
-		Tps:           payload.Tps,
+	dataStore := model.TrueResident{
+		FullName:    payload.FullName,
+		Address:     payload.Address,
+		Gender:      payload.Gender,
+		City:        payload.City,
+		District:    payload.District,
+		SubDistrict: payload.Subdistrict,
+		Nik:         payload.Nik,
+		Age:         payload.Age,
+		NoHandphone: payload.NoHandphone,
+		Tps:         payload.TPS,
 	}
 	if err := s.residentRepository.Store(ctx, dataStore); err != nil {
 		return err

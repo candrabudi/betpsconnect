@@ -2,15 +2,16 @@ package dto
 
 type (
 	TrueResidentPayload struct {
-		FullName    string `json:"full_name"`
-		Nik         string `json:"nik"`
-		Gender      string `json:"gender"`
-		District    string `json:"district"`
-		Subdistrict string `json:"subdistrict"`
-		City        string `json:"city"`
-		Age         int    `json:"age"`
-		NoHandphone string `json:"no_handphone"`
-		TPS         string `json:"tps"`
+		FullName    string `json:"full_name" validate:"required"`
+		Address     string `json:"address" validate:"required"`
+		Nik         string `json:"nik" validate:"required"`
+		Gender      string `json:"gender" validate:"required"`
+		District    string `json:"district" validate:"required"`
+		Subdistrict string `json:"subdistrict" validate:"required"`
+		City        string `json:"city" validate:"required"`
+		Age         int    `json:"age" validate:"required"`
+		NoHandphone string `json:"no_handphone" validate:"required"`
+		TPS         string `json:"tps" validate:"required"`
 	}
 
 	ResultAllTrueResident struct {

@@ -33,6 +33,7 @@ type Resident struct {
 	TanggalLahirString string    `bson:"tanggal_lahir_string,empty"`
 	Telp               string    `bson:"telp,empty"`
 	Tps                string    `bson:"tps,empty"`
+	IsVerification     int       `bson:"is_verification,empty"`
 	CreatedAt          time.Time `bson:"created_at,empty"`
 	UpdateAt           time.Time `bson:"updated_at,empty"`
 }

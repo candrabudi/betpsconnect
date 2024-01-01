@@ -52,8 +52,7 @@ type (
 		TempatLahir    string `json:"tampat_lahir"`
 		Telp           string `json:"telp"`
 		Tps            string `json:"tps"`
-		IsTrue         int    `json:"is_true"`
-		IsFalse        int    `json:"is_false"`
+		IsVerification int    `json:"is_verification"`
 	}
 
 	ResidentFilter struct {
@@ -65,18 +64,16 @@ type (
 	}
 
 	PayloadStoreResident struct {
-		Nama          string `json:"nama" binding:"required"`
-		Alamat        string `json:"alamat" binding:"required"`
-		JenisKelamin  string `json:"jenis_kelamin" binding:"required"`
-		NamaKabupaten string `json:"nama_kabupaten" binding:"required"`
-		NamaKecamatan string `json:"nama_kecamatan" binding:"required"`
-		NamaKelurahan string `json:"nama_kelurahan" binding:"required"`
-		Nik           string `json:"nik" binding:"required"`
-		Rt            string `json:"rt" binding:"required"`
-		Rw            string `json:"rw" binding:"required"`
-		Usia          int    `json:"usia" binding:"required"`
-		Telp          string `json:"Telp" binding:"required"`
-		Tps           string `json:"tps" binding:"required"`
+		FullName    string `json:"full_name" validate:"required"`
+		Nik         string `json:"nik" validate:"required"`
+		Gender      string `json:"gender" validate:"required"`
+		District    string `json:"district" validate:"required"`
+		Subdistrict string `json:"subdistrict" validate:"required"`
+		City        string `json:"city" validate:"required"`
+		Address     string `json:"address" validate:"required"`
+		Age         int    `json:"age" validate:"required"`
+		NoHandphone string `json:"no_handphone" validate:"required"`
+		TPS         string `json:"tps" validate:"required"`
 	}
 
 	PayloadUpdateValidInvalid struct {

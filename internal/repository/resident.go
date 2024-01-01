@@ -21,7 +21,7 @@ type Resident interface {
 	DetailResident(ctx context.Context, ResidentID int) (dto.DetailResident, error)
 	CheckResidentByNik(ctx context.Context, Nik string) (dto.DetailResident, error)
 	GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error)
-	Store(ctx context.Context, data model.Resident) error
+	Store(ctx context.Context, data model.TrueResident) error
 	GetKecamatanByKabupaten(ctx context.Context, kabupatenName string) ([]dto.FindAllResidentGrouped, error)
 }
 
@@ -222,8 +222,7 @@ func (r *resident) DetailResident(ctx context.Context, ResidentID int) (dto.Deta
 		TempatLahir:    dresident.TempatLahir,
 		Telp:           dresident.Telp,
 		Tps:            dresident.Tps,
-		IsTrue:         dresident.IsTrue,
-		IsFalse:        dresident.IsFalse,
+		IsVerification: dresident.IsVerification,
 	}
 
 	return residentDTO, nil
@@ -266,18 +265,26 @@ func (r *resident) CheckResidentByNik(ctx context.Context, Nik string) (dto.Deta
 		TempatLahir:    dresident.TempatLahir,
 		Telp:           dresident.Telp,
 		Tps:            dresident.Tps,
-		IsTrue:         dresident.IsTrue,
-		IsFalse:        dresident.IsFalse,
+		IsVerification: dresident.IsVerification,
 	}
 
 	return residentDTO, nil
 }
 
-func (r *resident) Store(ctx context.Context, data model.Resident) error {
+func (r *resident) Store(ctx context.Context, data model.TrueResident) error {
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
-	collectionName := "residents"
+	collectionName := "true_residents"
 
 	collection := r.MongoConn.Database(dbName).Collection(collectionName)
+
+	trueFilter := bson.M{"nik": data.Nik}
+
+	var existingResident model.TrueResident
+	err := collection.FindOne(ctx, trueFilter).Decode(&existingResident)
+	if err == nil {
+		return errors.New("NIK already exists")
+	}
+
 	person, err := r.getLastPerson(ctx, collection)
 	if err != nil {
 		return err
@@ -317,7 +324,23 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 			err = trueResidentCollection.FindOne(ctx, trueFilter).Decode(&mresident)
 
 			if err == nil {
+				if dresident.IsVerification == 0 {
+					filterUpdate := bson.M{"id": dresident.ID}
+
+					update := bson.M{
+						"$set": bson.M{
+							"is_deleted": 1,
+						},
+					}
+					_, err := collection.UpdateOne(ctx, filterUpdate, update)
+					if err != nil {
+						return duplicateData, err
+					}
+				}
 				duplicateData = append(duplicateData, dataResident.ID)
+				if err != nil {
+					return duplicateData, err
+				}
 				continue
 			}
 
@@ -326,7 +349,7 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 				return duplicateData, err
 			}
 			newUserID := person.ID + 1
-			filterUpdate := bson.M{"nik": dresident.Nik}
+			filterUpdate := bson.M{"id": dresident.ID}
 
 			update := bson.M{
 				"$set": bson.M{
@@ -343,6 +366,7 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 				TrueResident := model.TrueResident{
 					ID:          newUserID,
 					FullName:    dresident.Nama,
+					Address:     "RT " + dresident.Rt + "/ RW " + dresident.Rw + ", " + dresident.NamaKelurahan + ", " + dresident.NamaKecamatan + ", " + dresident.NamaKabupaten,
 					Nik:         dresident.Nik,
 					NoHandphone: dataResident.NoHandphone,
 					Age:         age,
@@ -380,8 +404,6 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 func (r *resident) calculateAge(TanggalLahir time.Time) int {
 	waktuSekarang := time.Now()
 	usia := waktuSekarang.Year() - TanggalLahir.Year()
-
-	// Koreksi jika belum ulang tahun pada tahun ini
 	if waktuSekarang.Month() < TanggalLahir.Month() || (waktuSekarang.Month() == TanggalLahir.Month() && waktuSekarang.Day() < TanggalLahir.Day()) {
 		usia--
 	}
