@@ -6,7 +6,9 @@ import (
 	"betpsconnect/pkg/util"
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
+	"strconv"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -17,7 +19,7 @@ import (
 
 type TrueResident interface {
 	Store(ctx context.Context, newData dto.TrueResidentPayload) error
-	GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultAllTrueResident, error)
+	GetAll(ctx context.Context, limit, offset int64, filter dto.TrueResidentFilter) (dto.ResultAllTrueResident, error)
 }
 
 type trueresident struct {
@@ -30,7 +32,8 @@ func NewTrueResidentRepository(mongoConn *mongo.Client) TrueResident {
 	}
 }
 
-func (tr *trueresident) GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultAllTrueResident, error) {
+func (tr *trueresident) GetAll(ctx context.Context, limit, offset int64, filter dto.TrueResidentFilter) (dto.ResultAllTrueResident, error) {
+
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collectionName := "true_residents"
 
@@ -56,6 +59,15 @@ func (tr *trueresident) GetAll(ctx context.Context, limit, offset int64, filter 
 		matchStage["tps"] = filter.TPS
 	}
 
+	if filter.IsManual != "" {
+		isManualInt, err := strconv.Atoi(filter.IsManual)
+		if err != nil {
+			fmt.Println("Failed to convert IsManual to int:", err)
+		} else {
+			matchStage["is_manual"] = isManualInt
+		}
+	}
+
 	if filter.Nama != "" {
 		regexPattern := regexp.QuoteMeta(filter.Nama)
 		matchStage["$or"] = []bson.M{{"full_name": primitive.Regex{Pattern: regexPattern, Options: "i"}}}
@@ -67,15 +79,20 @@ func (tr *trueresident) GetAll(ctx context.Context, limit, offset int64, filter 
 
 	projectStage := bson.M{
 		"$project": bson.M{
-			"_id":        1,
-			"id":         1,
-			"full_name":  1,
-			"gender":     1,
-			"district":   1,
-			"birth_date": 1,
-			"age":        1,
-			"tps":        1,
-			"nik":        1,
+			"_id":          1,
+			"id":           1,
+			"full_name":    1,
+			"gender":       1,
+			"city":         1,
+			"district":     1,
+			"subdistrict":  1,
+			"address":      1,
+			"birth_date":   1,
+			"age":          1,
+			"tps":          1,
+			"nik":          1,
+			"no_handphone": 1,
+			"is_manual":    1,
 		},
 	}
 
@@ -117,7 +134,7 @@ func (tr *trueresident) GetAll(ctx context.Context, limit, offset int64, filter 
 	return result, nil
 }
 
-func (tr *trueresident) GetTotalFilteredResidentCount(ctx context.Context, filter dto.ResidentFilter) (int32, error) {
+func (tr *trueresident) GetTotalFilteredResidentCount(ctx context.Context, filter dto.TrueResidentFilter) (int32, error) {
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collectionName := "true_residents"
 
@@ -139,6 +156,15 @@ func (tr *trueresident) GetTotalFilteredResidentCount(ctx context.Context, filte
 
 	if filter.TPS != "" {
 		filterOptions["tps"] = filter.TPS
+	}
+
+	if filter.IsManual != "" {
+		isManualInt, err := strconv.Atoi(filter.IsManual)
+		if err != nil {
+			fmt.Println("Failed to convert IsManual to int:", err)
+		} else {
+			filterOptions["is_manual"] = isManualInt
+		}
 	}
 
 	if filter.Nama != "" {

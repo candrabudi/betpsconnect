@@ -15,7 +15,7 @@ type service struct {
 
 type Service interface {
 	Store(ctx context.Context, payload dto.TrueResidentPayload) error
-	GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultAllTrueResident, error)
+	GetAll(ctx context.Context, limit, offset int64, filter dto.TrueResidentFilter, userSess any) (dto.ResultAllTrueResident, error)
 }
 
 func NewService(f *factory.Factory) Service {
@@ -24,7 +24,7 @@ func NewService(f *factory.Factory) Service {
 	}
 }
 
-func (s *service) GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultAllTrueResident, error) {
+func (s *service) GetAll(ctx context.Context, limit, offset int64, filter dto.TrueResidentFilter, userSess any) (dto.ResultAllTrueResident, error) {
 	user, ok := userSess.(model.User)
 	if !ok {
 		return dto.ResultAllTrueResident{}, errors.New("invalid user session data")

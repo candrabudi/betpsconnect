@@ -34,11 +34,12 @@ func (h *handler) GetTrueResidents(c *gin.Context) {
 		offset = 0
 	}
 
-	filter := dto.ResidentFilter{
+	filter := dto.TrueResidentFilter{
 		NamaKabupaten: c.Query("nama_kabupaten"),
 		NamaKecamatan: c.Query("nama_kecamatan"),
 		NamaKelurahan: c.Query("nama_kelurahan"),
 		TPS:           c.Query("tps"),
+		IsManual:      c.Query("is_manual"),
 		Nama:          c.Query("nama"),
 	}
 

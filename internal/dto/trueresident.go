@@ -19,15 +19,28 @@ type (
 		Metadata MetaData              `json:"metadata"`
 	}
 
+	TrueResidentFilter struct {
+		NamaKabupaten string `json:"nama_kabupaten"`
+		NamaKecamatan string `json:"nama_kecamatan"`
+		NamaKelurahan string `json:"nama_kelurahan"`
+		TPS           string `json:"tps"`
+		IsManual      string `json:"is_manual"`
+		Nama          string `json:"nama"`
+	}
+
 	FindTrueAllResident struct {
 		ID            int    `bson:"id,omitempty" json:"id"`
 		Nama          string `bson:"full_name,omitempty" json:"nama"`
 		JenisKelamin  string `bson:"gender,omitempty" json:"jenis_kelamin"`
+		NamaKabupaten string `bson:"city,omitempty" json:"nama_kabupaten"`
 		NamaKecamatan string `bson:"district,omitempty" json:"nama_kecamatan"`
+		NamaKelurahan string `bson:"subdistrict,omitempty" json:"nama_kelurahan"`
+		Address       string `bson:"address,omitempty" json:"alamat"`
 		Nik           string `bson:"nik,omitempty" json:"nik"`
-		TanggalLahir  string `bson:"birth_date,omitempty" json:"tanggal_lahir"`
 		Usia          int    `bson:"age,omitempty" json:"usia"`
 		Tps           string `bson:"tps,omitempty" json:"tps"`
+		NoHandphone   string `bson:"no_handphone,omitempty" json:"telp"`
+		IsManual      int    `bson:"is_manual,omitempty" json:"is_manual"`
 	}
 
 	DetailTrueResident struct {
