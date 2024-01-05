@@ -13,6 +13,7 @@ type Factory struct {
 	UserRepository         repository.User
 	UserTokenRepository    repository.UserToken
 	TrueResidentRepository repository.TrueResident
+	CoordinationRepository repository.Coordination
 }
 
 func NewFactory() *Factory {
@@ -25,5 +26,6 @@ func NewFactory() *Factory {
 		UserRepository:         repository.NewUserRepository(mongoConn),
 		UserTokenRepository:    repository.NewUserTokenRepository(mongoConn),
 		TrueResidentRepository: repository.NewTrueResidentRepository(mongoConn),
+		CoordinationRepository: repository.NewCoordinationRepository(mongoConn),
 	}
 }

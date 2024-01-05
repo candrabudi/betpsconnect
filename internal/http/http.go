@@ -2,6 +2,7 @@ package http
 
 import (
 	City "betpsconnect/internal/app/city"
+	Coordination "betpsconnect/internal/app/coordination"
 	District "betpsconnect/internal/app/district"
 	Resident "betpsconnect/internal/app/resident"
 	SubDistrict "betpsconnect/internal/app/subdistrict"
@@ -32,7 +33,7 @@ func NewHttp(g *gin.Engine, f *factory.Factory) {
 	City.NewHandler(f).Router(v1.Group("/city"))
 	User.NewHandler(f).Router(v1.Group("/user"))
 	TrueResident.NewHandler(f).Router(v1.Group("/validresident"))
-
+	Coordination.NewHandler(f).Router(v1.Group("/koordinator"))
 }
 
 func Index(g *gin.Engine) {

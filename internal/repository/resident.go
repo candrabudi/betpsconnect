@@ -585,7 +585,7 @@ func (r *resident) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsBy
 	}
 	defer cursor.Close(ctx)
 
-	var results []string // Inisialisasi slice kosong untuk hasil
+	var results []string
 
 	if cursor.Next(ctx) {
 		var result struct {
@@ -594,12 +594,20 @@ func (r *resident) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsBy
 		if err := cursor.Decode(&result); err != nil {
 			return nil, err
 		}
-		results = result.TPS
-	}
 
-	// Jika hasilnya kosong, kembalikan slice kosong
-	if len(results) == 0 {
-		return []string{}, nil
+		// Filter nilai-nilai kosong sebelum mengembalikan hasil
+		var nonEmptyResults []string
+		for _, tps := range result.TPS {
+			if tps != "" {
+				nonEmptyResults = append(nonEmptyResults, tps)
+			}
+		}
+
+		if len(nonEmptyResults) == 0 {
+			return []string{}, nil
+		}
+
+		return nonEmptyResults, nil
 	}
 
 	if err := cursor.Err(); err != nil {
