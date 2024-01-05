@@ -20,6 +20,7 @@ import (
 type TrueResident interface {
 	Store(ctx context.Context, newData dto.TrueResidentPayload) error
 	GetAll(ctx context.Context, limit, offset int64, filter dto.TrueResidentFilter) (dto.ResultAllTrueResident, error)
+	Update(ctx context.Context, ID int, updatedData dto.PayloadUpdateTrueResident) error
 }
 
 type trueresident struct {
@@ -129,6 +130,35 @@ func (tr *trueresident) GetAll(ctx context.Context, limit, offset int64, filter 
 	}
 
 	return result, nil
+}
+
+func (tr *trueresident) Update(ctx context.Context, ID int, updatedData dto.PayloadUpdateTrueResident) error {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "true_residents"
+
+	collection := tr.MongoConn.Database(dbName).Collection(collectionName)
+	filter := bson.M{"id": ID}
+
+	update := bson.M{
+		"$set": bson.M{
+			"full_name":    updatedData.FullName,
+			"nik":          updatedData.Nik,
+			"no_handphone": updatedData.NoHandphone,
+			"age":          updatedData.Age,
+			"address":      updatedData.Address,
+			"subdistrict":  updatedData.Subdistrict,
+			"district":     updatedData.District,
+			"city":         updatedData.City,
+			"tps":          updatedData.TPS,
+		},
+	}
+
+	_, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (tr *trueresident) GetTotalFilteredResidentCount(ctx context.Context, filter dto.TrueResidentFilter) (int32, error) {

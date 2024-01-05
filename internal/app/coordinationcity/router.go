@@ -1,4 +1,4 @@
-package trueresident
+package coordinationcity
 
 import (
 	"betpsconnect/internal/middleware"
@@ -8,7 +8,7 @@ import (
 
 func (h *handler) Router(g *gin.RouterGroup) {
 	g.Use(middleware.Authenticate())
-	g.GET("/list", h.GetTrueResidents)
+	g.GET("/list", h.GetListCoordinationCity)
 	g.POST("/store", h.Store)
 	g.PUT("/update/:id", h.Update)
 }

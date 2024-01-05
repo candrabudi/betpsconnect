@@ -10,16 +10,18 @@ import (
 )
 
 type service struct {
-	coordinationRepository repository.Coordination
+	coordinationCityRepository repository.CoordinationCity
 }
 
 type Service interface {
 	GetListCoordinationCity(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultAllCoordinatorCity, error)
+	Store(ctx context.Context, payload dto.PayloadStoreCoordinatorCity) error
+	Update(ctx context.Context, ID int, payload dto.PayloadStoreCoordinatorCity) error
 }
 
 func NewService(f *factory.Factory) Service {
 	return &service{
-		coordinationRepository: f.CoordinationRepository,
+		coordinationCityRepository: f.CoordinationCityRepository,
 	}
 }
 
@@ -33,7 +35,7 @@ func (s *service) GetListCoordinationCity(ctx context.Context, limit, offset int
 		filter.NamaKabupaten = user.Regency
 	}
 
-	resultTpsResidents, err := s.coordinationRepository.GetAll(ctx, limit, offset, filter)
+	resultTpsResidents, err := s.coordinationCityRepository.GetAll(ctx, limit, offset, filter)
 	if err != nil {
 		return dto.ResultAllCoordinatorCity{
 			Items:    []dto.FindCoordinatorCity{},
@@ -48,4 +50,24 @@ func (s *service) GetListCoordinationCity(ctx context.Context, limit, offset int
 		}, nil
 	}
 	return resultTpsResidents, nil
+}
+
+func (s *service) Store(ctx context.Context, payload dto.PayloadStoreCoordinatorCity) error {
+
+	err := s.coordinationCityRepository.Store(ctx, payload)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *service) Update(ctx context.Context, ID int, payload dto.PayloadStoreCoordinatorCity) error {
+
+	err := s.coordinationCityRepository.Update(ctx, ID, payload)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

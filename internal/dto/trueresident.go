@@ -28,6 +28,19 @@ type (
 		IsManual      string `json:"is_manual"`
 	}
 
+	PayloadUpdateTrueResident struct {
+		FullName    string `json:"full_name"`
+		Address     string `json:"address"`
+		Nik         string `json:"nik"`
+		Gender      string `json:"gender"`
+		District    string `json:"district"`
+		Subdistrict string `json:"subdistrict"`
+		City        string `json:"city"`
+		Age         int    `json:"age"`
+		NoHandphone string `json:"no_handphone"`
+		TPS         string `json:"tps"`
+	}
+
 	FindTrueAllResident struct {
 		ID            int    `bson:"id,omitempty" json:"id"`
 		Nama          string `bson:"full_name,omitempty" json:"nama"`

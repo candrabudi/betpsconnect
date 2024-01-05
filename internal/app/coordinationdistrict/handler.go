@@ -1,4 +1,4 @@
-package trueresident
+package coordinationdistrict
 
 import (
 	"betpsconnect/internal/dto"
@@ -22,7 +22,7 @@ func NewHandler(f *factory.Factory) *handler {
 	}
 }
 
-func (h *handler) GetTrueResidents(c *gin.Context) {
+func (h *handler) GetAll(c *gin.Context) {
 	ctx := c.Request.Context()
 	limit, err := strconv.ParseInt(c.Query("limit"), 10, 64)
 	if err != nil || limit <= 0 {
@@ -34,29 +34,23 @@ func (h *handler) GetTrueResidents(c *gin.Context) {
 		offset = 0
 	}
 
-	filter := dto.TrueResidentFilter{
-		NamaKabupaten: c.Query("nama_kabupaten"),
-		NamaKecamatan: c.Query("nama_kecamatan"),
-		NamaKelurahan: c.Query("nama_kelurahan"),
-		TPS:           c.Query("tps"),
-		IsManual:      c.Query("is_manual"),
-		Nama:          c.Query("nama"),
+	filter := dto.ResidentFilter{
+		Nama: c.Query("nama"),
 	}
 
-	// Menggunakan nilai limit, offset, dan filter untuk memanggil service.GetListResident
 	data, err := h.service.GetAll(ctx, limit, offset, filter, c.Value("user"))
 	if err != nil {
-		response := util.APIResponse("Failed to retrieve resident list: "+err.Error(), http.StatusInternalServerError, "failed", nil)
+		response := util.APIResponse("Failed to retrieve coordination city list: "+err.Error(), http.StatusInternalServerError, "failed", nil)
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := util.APIResponse("Success get list of residents", http.StatusOK, "success", data)
+	response := util.APIResponse("Success get list of coordination district", http.StatusOK, "success", data)
 	c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) Store(c *gin.Context) {
-	var payload dto.TrueResidentPayload
+	var payload dto.PayloadStoreCoordinatorDistrict
 	if err := c.ShouldBind(&payload); err != nil {
 		errorMessage := gin.H{"errors": "Please fill data"}
 		if err != io.EOF {
@@ -76,13 +70,13 @@ func (h *handler) Store(c *gin.Context) {
 		return
 	}
 
-	response := util.APIResponse("Success store valid resident", http.StatusOK, "success", nil)
+	response := util.APIResponse("Success store coordination district", http.StatusOK, "success", nil)
 	c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) Update(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param("id"))
-	var payload dto.PayloadUpdateTrueResident
+	var payload dto.PayloadUpdateCoordinatorDistrict
 	if err := c.ShouldBind(&payload); err != nil {
 		errorMessage := gin.H{"errors": "Please fill data"}
 		if err != io.EOF {
@@ -102,6 +96,6 @@ func (h *handler) Update(c *gin.Context) {
 		return
 	}
 
-	response := util.APIResponse("Success update valid resident", http.StatusOK, "success", nil)
+	response := util.APIResponse("Success update coordination district", http.StatusOK, "success", nil)
 	c.JSON(http.StatusOK, response)
 }

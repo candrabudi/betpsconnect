@@ -15,6 +15,7 @@ type service struct {
 
 type Service interface {
 	Store(ctx context.Context, payload dto.TrueResidentPayload) error
+	Update(ctx context.Context, ID int, payload dto.PayloadUpdateTrueResident) error
 	GetAll(ctx context.Context, limit, offset int64, filter dto.TrueResidentFilter, userSess any) (dto.ResultAllTrueResident, error)
 }
 
@@ -44,6 +45,16 @@ func (s *service) GetAll(ctx context.Context, limit, offset int64, filter dto.Tr
 func (s *service) Store(ctx context.Context, payload dto.TrueResidentPayload) error {
 
 	err := s.trueResidentRepository.Store(ctx, payload)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *service) Update(ctx context.Context, ID int, payload dto.PayloadUpdateTrueResident) error {
+
+	err := s.trueResidentRepository.Update(ctx, ID, payload)
 	if err != nil {
 		return err
 	}
