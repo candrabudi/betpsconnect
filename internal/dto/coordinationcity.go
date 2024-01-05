@@ -24,7 +24,7 @@ type (
 		KorkabName    string `json:"korkab_name"`
 		KorkabNik     string `json:"korkab_nik"`
 		KorkabPhone   string `json:"korkab_phone"`
-		KorkabAge     string `json:"korkab_age"`
+		KorkabAge     int    `json:"korkab_age"`
 		KorkabAddress string `json:"korkab_address"`
 		KorkabCity    string `json:"korkab_city"`
 	}

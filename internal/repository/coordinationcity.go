@@ -43,7 +43,7 @@ func (cc *coordinationcity) GetAll(ctx context.Context, limit, offset int64, fil
 
 	if filter.Nama != "" {
 		regexPattern := regexp.QuoteMeta(filter.Nama)
-		matchStage["coordination_name"] = primitive.Regex{Pattern: regexPattern, Options: "i"}
+		matchStage["korkab_name"] = primitive.Regex{Pattern: regexPattern, Options: "i"}
 	}
 
 	if len(matchStage) > 0 {
@@ -52,14 +52,14 @@ func (cc *coordinationcity) GetAll(ctx context.Context, limit, offset int64, fil
 
 	projectStage := bson.M{
 		"$project": bson.M{
-			"_id":                  1,
-			"id":                   1,
-			"coordination_name":    1,
-			"coordination_nik":     1,
-			"coordination_phone":   1,
-			"coordination_age":     1,
-			"coordination_address": 1,
-			"coordination_city":    1,
+			"_id":            1,
+			"id":             1,
+			"korkab_name":    1,
+			"korkab_nik":     1,
+			"korkab_phone":   1,
+			"korkab_age":     1,
+			"korkab_address": 1,
+			"korkab_city":    1,
 		},
 	}
 
@@ -141,7 +141,7 @@ func (cc *coordinationcity) GetTotalFilteredCoordinationCount(ctx context.Contex
 func (cc *coordinationcity) Store(ctx context.Context, newData dto.PayloadStoreCoordinatorCity) error {
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collection := cc.MongoConn.Database(dbName).Collection("coordination_city")
-	trueFilter := bson.M{"coordination_nik": newData.KorkabNik}
+	trueFilter := bson.M{"kab_nik": newData.KorkabNik}
 
 	var existingResident model.TrueResident
 	err := collection.FindOne(ctx, trueFilter).Decode(&existingResident)

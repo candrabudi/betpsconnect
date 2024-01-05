@@ -21,7 +21,7 @@ type (
 		KorcamName     string `json:"korcam_name"`
 		KorcamNik      string `json:"korcam_nik"`
 		KorcamPhone    string `json:"korcam_phone"`
-		KorcamAge      string `json:"korcam_age"`
+		KorcamAge      int    `json:"korcam_age"`
 		KorcamAddress  string `json:"korcam_address"`
 		KorcamCity     string `json:"korcam_city"`
 		KorcamDistrict string `json:"korcam_district"`
@@ -31,7 +31,7 @@ type (
 		KorcamName     string `json:"korcam_name"`
 		KorcamNik      string `json:"korcam_nik"`
 		KorcamPhone    string `json:"korcam_phone"`
-		KorcamAge      string `json:"korcam_age"`
+		KorcamAge      int    `json:"korcam_age"`
 		KorcamAddress  string `json:"korcam_address"`
 		KorcamCity     string `json:"korcam_city"`
 		KorcamDistrict string `json:"korcam_district"`

@@ -6,6 +6,7 @@ import (
 	"betpsconnect/pkg/util"
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
 	"time"
 
@@ -177,6 +178,7 @@ func (cd *coordinationdistrict) Store(ctx context.Context, newData dto.PayloadSt
 	var dCoordinationCity model.CoordinationCity
 	err = collectionCity.FindOne(ctx, filter).Decode(&dCoordinationCity)
 	if err != nil {
+		fmt.Println(newData.KorkabID)
 		return errors.New("No Data Korkab")
 	}
 
