@@ -471,15 +471,12 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 							"is_deleted": 1,
 						},
 					}
-					_, err := collection.UpdateOne(ctx, filterUpdate, update)
+					_, err = collection.UpdateOne(ctx, filterUpdate, update)
 					if err != nil {
 						return duplicateData, err
 					}
 				}
 				duplicateData = append(duplicateData, dataResident.ID)
-				if err != nil {
-					return duplicateData, err
-				}
 				continue
 			}
 
@@ -502,6 +499,12 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 			if result.ModifiedCount > 0 {
 				birthDate, _ := time.Parse("2006-01-02", dresident.TanggalLahir)
 				age := r.calculateAge(birthDate)
+				var tps string
+				if dataResident.Tps != "" {
+					tps = dataResident.Tps
+				} else {
+					tps = dresident.Tps
+				}
 				TrueResident := model.TrueResident{
 					ID:          newUserID,
 					FullName:    dresident.Nama,
@@ -513,7 +516,7 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 					City:        dresident.NamaKabupaten,
 					District:    dresident.NamaKecamatan,
 					SubDistrict: dresident.NamaKelurahan,
-					Tps:         dresident.Tps,
+					Tps:         tps,
 					IsManual:    0,
 					CreatedAt:   time.Now(),
 					UpdatedAt:   time.Now(),

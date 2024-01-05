@@ -123,6 +123,7 @@ type (
 	PayloadBulkValidateResident struct {
 		ID          int    `json:"id", binding:"required"`
 		NoHandphone string `json:"no_handphone", binding:"required"`
+		Tps         string `json:"tps", binding:"required"`
 	}
 
 	ResultsDuplicateUpdateResident struct {
