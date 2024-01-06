@@ -78,7 +78,6 @@ func (h *handler) Store(c *gin.Context) {
 }
 
 func (h *handler) Update(c *gin.Context) {
-	fmt.Println("kodok")
 	ID, _ := strconv.Atoi(c.Param("id"))
 	var payload dto.PayloadUpdateCoordinatorDistrict
 	if err := c.ShouldBind(&payload); err != nil {

@@ -1,4 +1,4 @@
-package coordinationsubdistrict
+package coordinationtps
 
 import (
 	"betpsconnect/internal/dto"
@@ -34,26 +34,27 @@ func (h *handler) GetAll(c *gin.Context) {
 		offset = 0
 	}
 
-	filter := dto.CoordinationSubdistrictFilter{
+	filter := dto.CoordinationTpsFilter{
 		Nama:          c.Query("nama"),
 		NamaKabupaten: c.Query("nama_kabupaten"),
 		NamaKecamatan: c.Query("nama_kecamatan"),
 		Jaringan:      c.Query("jaringan"),
+		Tps:           c.Query("tps"),
 	}
 
 	data, err := h.service.GetAll(ctx, limit, offset, filter, c.Value("user"))
 	if err != nil {
-		response := util.APIResponse("Failed to retrieve coordination subdistrict list: "+err.Error(), http.StatusInternalServerError, "failed", nil)
+		response := util.APIResponse("Failed to retrieve coordination tps list: "+err.Error(), http.StatusInternalServerError, "failed", nil)
 		c.JSON(http.StatusInternalServerError, response)
 		return
 	}
 
-	response := util.APIResponse("Success get list of coordination subdistrict", http.StatusOK, "success", data)
+	response := util.APIResponse("Success get list of coordination tps", http.StatusOK, "success", data)
 	c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) Store(c *gin.Context) {
-	var payload dto.PayloadStoreCoordinatorSubdistrict
+	var payload dto.PayloadStoreCoordinatorTps
 	if err := c.ShouldBind(&payload); err != nil {
 		errorMessage := gin.H{"errors": "Please fill data"}
 		if err != io.EOF {
@@ -73,13 +74,13 @@ func (h *handler) Store(c *gin.Context) {
 		return
 	}
 
-	response := util.APIResponse("Success store coordination subdistrict", http.StatusOK, "success", nil)
+	response := util.APIResponse("Success store coordination tps", http.StatusOK, "success", nil)
 	c.JSON(http.StatusOK, response)
 }
 
 func (h *handler) Update(c *gin.Context) {
 	ID, _ := strconv.Atoi(c.Param("id"))
-	var payload dto.PayloadUpdateCoordinatorSubdistrict
+	var payload dto.PayloadUpdateCoordinatorTps
 	if err := c.ShouldBind(&payload); err != nil {
 		errorMessage := gin.H{"errors": "Please fill data"}
 		if err != io.EOF {
@@ -99,6 +100,6 @@ func (h *handler) Update(c *gin.Context) {
 		return
 	}
 
-	response := util.APIResponse("Success update coordination subdistrict", http.StatusOK, "success", nil)
+	response := util.APIResponse("Success update coordination tps", http.StatusOK, "success", nil)
 	c.JSON(http.StatusOK, response)
 }

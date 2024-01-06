@@ -16,6 +16,7 @@ type Factory struct {
 	CoordinationCityRepository        repository.CoordinationCity
 	CoordinationDistrictRepository    repository.CoordinationDistrict
 	CoordinationSubdistrictRepository repository.CoordinationSubdistrict
+	CoordinationTpsRepository         repository.CoordinationTps
 }
 
 func NewFactory() *Factory {
@@ -31,5 +32,6 @@ func NewFactory() *Factory {
 		CoordinationCityRepository:        repository.NewCoordinationCityRepository(mongoConn),
 		CoordinationDistrictRepository:    repository.NewCoordinationDistrictRepository(mongoConn),
 		CoordinationSubdistrictRepository: repository.NewCoordinationSubdistrictRepository(mongoConn),
+		CoordinationTpsRepository:         repository.NewCoordinationTpsRepository(mongoConn),
 	}
 }

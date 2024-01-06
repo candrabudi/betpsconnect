@@ -7,7 +7,6 @@ import (
 	"betpsconnect/internal/repository"
 	"context"
 	"errors"
-	"fmt"
 )
 
 type service struct {
@@ -35,8 +34,6 @@ func (s *service) GetAll(ctx context.Context, limit, offset int64, filter dto.Co
 	if user.Role == "admin" {
 		filter.NamaKabupaten = user.Regency
 	}
-
-	fmt.Println(filter)
 
 	resultTpsResidents, err := s.coordinationSubdistrict.GetAll(ctx, limit, offset, filter)
 	if err != nil {

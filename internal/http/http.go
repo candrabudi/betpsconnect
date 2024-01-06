@@ -5,6 +5,7 @@ import (
 	CoordinationCity "betpsconnect/internal/app/coordinationcity"
 	CoordinationDistrict "betpsconnect/internal/app/coordinationdistrict"
 	CoordinationSubdistrict "betpsconnect/internal/app/coordinationsubdistrict"
+	CoordinationTps "betpsconnect/internal/app/coordinationtps"
 	District "betpsconnect/internal/app/district"
 	Resident "betpsconnect/internal/app/resident"
 	SubDistrict "betpsconnect/internal/app/subdistrict"
@@ -38,6 +39,7 @@ func NewHttp(g *gin.Engine, f *factory.Factory) {
 	CoordinationCity.NewHandler(f).Router(v1.Group("/kordinator/kabupaten"))
 	CoordinationDistrict.NewHandler(f).Router(v1.Group("/kordinator/kecamatan"))
 	CoordinationSubdistrict.NewHandler(f).Router(v1.Group("/kordinator/kelurahan"))
+	CoordinationTps.NewHandler(f).Router(v1.Group("/kordinator/tps"))
 }
 
 func Index(g *gin.Engine) {

@@ -6,7 +6,6 @@ import (
 	"betpsconnect/pkg/util"
 	"context"
 	"errors"
-	"fmt"
 	"regexp"
 	"time"
 
@@ -43,7 +42,6 @@ func (cd *coordinationdistrict) GetAll(ctx context.Context, limit, offset int64,
 	matchStage := bson.M{}
 
 	if filter.NamaKabupaten != "" {
-		fmt.Println(filter.NamaKabupaten)
 		matchStage["korcam_city"] = filter.NamaKabupaten
 	}
 
@@ -131,6 +129,10 @@ func (cd *coordinationdistrict) GetTotalFilteredCoordinationCount(ctx context.Co
 
 	if filter.NamaKecamatan != "" {
 		filterOptions["korcam_district"] = filter.NamaKecamatan
+	}
+
+	if filter.Jaringan != "" {
+		filterOptions["korcam_network"] = filter.Jaringan
 	}
 
 	if filter.Nama != "" {
