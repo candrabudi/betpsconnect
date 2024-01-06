@@ -4,8 +4,6 @@ import "time"
 
 type CoordinationDistrict struct {
 	ID             int       `bson:"id,empty"`
-	KorkabID       int       `bson:"korcam_id"`
-	KorkabName     string    `bson:"korkab_name,empty"`
 	KorcamName     string    `bson:"korcam_name,empty"`
 	KorcamNik      string    `bson:"korcam_nik,empty"`
 	KorcamPhone    string    `bson:"korcam_phone,empty"`

@@ -66,7 +66,6 @@ func (s *service) Store(ctx context.Context, payload dto.PayloadStoreCoordinator
 }
 
 func (s *service) Update(ctx context.Context, ID int, payload dto.PayloadUpdateCoordinatorDistrict) error {
-
 	err := s.coordinationDistrict.Update(ctx, ID, payload)
 	if err != nil {
 		return err

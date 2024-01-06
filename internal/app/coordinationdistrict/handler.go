@@ -53,6 +53,7 @@ func (h *handler) GetAll(c *gin.Context) {
 }
 
 func (h *handler) Store(c *gin.Context) {
+	fmt.Println("tai")
 	var payload dto.PayloadStoreCoordinatorDistrict
 	if err := c.ShouldBind(&payload); err != nil {
 		errorMessage := gin.H{"errors": "Please fill data"}
@@ -78,6 +79,7 @@ func (h *handler) Store(c *gin.Context) {
 }
 
 func (h *handler) Update(c *gin.Context) {
+	fmt.Println("kodok")
 	ID, _ := strconv.Atoi(c.Param("id"))
 	var payload dto.PayloadUpdateCoordinatorDistrict
 	if err := c.ShouldBind(&payload); err != nil {

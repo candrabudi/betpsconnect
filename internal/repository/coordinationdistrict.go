@@ -217,6 +217,7 @@ func (cd *coordinationdistrict) Update(ctx context.Context, ID int, updatedData 
 			"korcam_address":  updatedData.KorcamAddress,
 			"korcam_city":     updatedData.KorcamCity,
 			"korcam_district": updatedData.KorcamCity,
+			"korcam_network":  updatedData.KorcamNetwork,
 			"updated_at":      time.Now(),
 		},
 	}
