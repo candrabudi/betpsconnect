@@ -44,7 +44,7 @@ func (d *district) GetByCity(ctx context.Context, filter dto.GetByCity) ([]strin
 	// Lakukan query ke MongoDB menggunakan filter yang telah dibuat sebelumnya
 	cursor, err := collection.Find(ctx, bsonFilter)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 	defer cursor.Close(ctx)
 
@@ -52,13 +52,13 @@ func (d *district) GetByCity(ctx context.Context, filter dto.GetByCity) ([]strin
 	for cursor.Next(ctx) {
 		var dresident model.Resident
 		if err := cursor.Decode(&dresident); err != nil {
-			return nil, err
+			return []string{}, err
 		}
 		kecamatan = append(kecamatan, dresident.NamaKecamatan)
 	}
 
 	if err := cursor.Err(); err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	// Menggunakan sort.Strings untuk mengurutkan kecamatan dari awal ke akhir

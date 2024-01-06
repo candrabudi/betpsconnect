@@ -43,7 +43,7 @@ func (s *subdistrict) GetByDistrict(ctx context.Context, filter dto.GetByDistric
 	}
 	cursor, err := collection.Find(ctx, bsonFilter)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 	defer cursor.Close(ctx)
 
@@ -51,13 +51,13 @@ func (s *subdistrict) GetByDistrict(ctx context.Context, filter dto.GetByDistric
 	for cursor.Next(ctx) {
 		var dresident model.Resident
 		if err := cursor.Decode(&dresident); err != nil {
-			return nil, err
+			return []string{}, err
 		}
 		kelurahan = append(kelurahan, dresident.NamaKelurahan)
 	}
 
 	if err := cursor.Err(); err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	sort.Strings(kelurahan)

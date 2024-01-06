@@ -31,7 +31,7 @@ func (c *city) GetCity(ctx context.Context) ([]string, error) {
 	// Melakukan pencarian tanpa filter
 	cursor, err := collection.Find(ctx, bson.M{})
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 	defer cursor.Close(ctx)
 
@@ -40,13 +40,13 @@ func (c *city) GetCity(ctx context.Context) ([]string, error) {
 	for cursor.Next(ctx) {
 		var ddistrict model.District
 		if err := cursor.Decode(&ddistrict); err != nil {
-			return nil, err
+			return []string{}, err
 		}
 		cityMap[ddistrict.NamaKabupaten] = true
 	}
 
 	if err := cursor.Err(); err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	// Ubah map menjadi array string yang diinginkan
