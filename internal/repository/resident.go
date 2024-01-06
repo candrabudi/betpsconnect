@@ -403,7 +403,7 @@ func (r *resident) CheckResidentByNik(ctx context.Context, Nik string) (dto.Deta
 		Usia:           dresident.Usia,
 		TempatLahir:    dresident.TempatLahir,
 		Telp:           dresident.Telp,
-		Tps:            dresident.Tps,
+		Tps:            removeLeadingZeros(dresident.Tps),
 		IsVerification: dresident.IsVerification,
 	}
 
