@@ -517,6 +517,7 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 					District:    dresident.NamaKecamatan,
 					SubDistrict: dresident.NamaKelurahan,
 					Tps:         tps,
+					Jaringan:    dataResident.Jaringan,
 					IsManual:    0,
 					CreatedAt:   time.Now(),
 					UpdatedAt:   time.Now(),

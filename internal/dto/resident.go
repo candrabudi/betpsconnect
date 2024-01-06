@@ -124,6 +124,7 @@ type (
 		ID          int    `json:"id", binding:"required"`
 		NoHandphone string `json:"no_handphone", binding:"required"`
 		Tps         string `json:"tps", binding:"required"`
+		Jaringan    string `json:"jaringan"`
 	}
 
 	ResultsDuplicateUpdateResident struct {

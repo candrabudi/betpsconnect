@@ -12,6 +12,7 @@ type (
 		Age         int    `json:"age" validate:"required"`
 		NoHandphone string `json:"no_handphone" validate:"required"`
 		TPS         string `json:"tps" validate:"required"`
+		Jaringan    string `json:"jaringan"`
 	}
 
 	ResultAllTrueResident struct {
@@ -53,6 +54,7 @@ type (
 		Usia          int    `bson:"age,omitempty" json:"usia"`
 		Tps           string `bson:"tps,omitempty" json:"tps"`
 		NoHandphone   string `bson:"no_handphone,omitempty" json:"telp"`
+		Jaringan      string `bson:"network,empty" json:"jaringan"`
 		IsManual      int    `bson:"is_manual,omitempty" json:"is_manual"`
 	}
 

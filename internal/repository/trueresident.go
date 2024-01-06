@@ -90,6 +90,7 @@ func (tr *trueresident) GetAll(ctx context.Context, limit, offset int64, filter 
 			"tps":          1,
 			"nik":          1,
 			"no_handphone": 1,
+			"network":      1,
 			"is_manual":    1,
 		},
 	}
@@ -250,6 +251,7 @@ func (tr *trueresident) Store(ctx context.Context, newData dto.TrueResidentPaylo
 		City:        newData.City,
 		District:    newData.District,
 		SubDistrict: newData.Subdistrict,
+		Jaringan:    newData.Jaringan,
 		Tps:         newData.TPS,
 		IsManual:    1,
 		CreatedAt:   time.Now(),

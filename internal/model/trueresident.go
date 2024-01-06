@@ -17,6 +17,7 @@ type TrueResident struct {
 	KorcamName  string    `bson:"korcam_name, empty"`
 	KordesName  string    `bson:"kordes_name, empty"`
 	KortpsName  string    `bson:"kortps_name, empty"`
+	Jaringan    string    `bson:"network, empty"`
 	IsManual    int       `bson:"is_manual, empty"`
 	CreatedAt   time.Time `bson:"created_at,omitempty"`
 	UpdatedAt   time.Time `bson:"updated_at,omitempty"`
