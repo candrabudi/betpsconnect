@@ -42,7 +42,7 @@ func (cc *coordinationcity) GetAll(ctx context.Context, limit, offset int64, fil
 	matchStage := bson.M{}
 
 	if filter.NamaKabupaten != "" {
-		matchStage["korcam_city"] = filter.NamaKabupaten
+		matchStage["korkab_city"] = filter.NamaKabupaten
 	}
 
 	if filter.Nama != "" {
