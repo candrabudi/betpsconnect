@@ -585,7 +585,7 @@ func (r *resident) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsBy
 
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 	defer cursor.Close(ctx)
 
@@ -596,7 +596,7 @@ func (r *resident) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsBy
 			TPS []string `bson:"tps"`
 		}
 		if err := cursor.Decode(&result); err != nil {
-			return nil, err
+			return []string{}, err
 		}
 
 		// Filter nilai-nilai kosong sebelum mengembalikan hasil
@@ -615,7 +615,7 @@ func (r *resident) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsBy
 	}
 
 	if err := cursor.Err(); err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	return results, nil

@@ -324,7 +324,7 @@ func (tr *trueresident) GetTpsOnValidResident(ctx context.Context, filter dto.Fi
 
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
 	defer cursor.Close(ctx)
 
@@ -335,7 +335,7 @@ func (tr *trueresident) GetTpsOnValidResident(ctx context.Context, filter dto.Fi
 			TPS []string `bson:"tps"`
 		}
 		if err := cursor.Decode(&result); err != nil {
-			return nil, err
+			return []string{}, err
 		}
 
 		var nonEmptyResults []string
@@ -353,7 +353,7 @@ func (tr *trueresident) GetTpsOnValidResident(ctx context.Context, filter dto.Fi
 	}
 
 	if err := cursor.Err(); err != nil {
-		return nil, err
+		return []string{}, err
 	}
 
 	return results, nil
