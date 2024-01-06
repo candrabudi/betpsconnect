@@ -34,10 +34,11 @@ func (h *handler) GetAll(c *gin.Context) {
 		offset = 0
 	}
 
-	filter := dto.ResidentFilter{
+	filter := dto.CoordinationDistrictFilter{
 		Nama:          c.Query("nama"),
 		NamaKabupaten: c.Query("nama_kabupaten"),
 		NamaKecamatan: c.Query("nama_kecamatan"),
+		Jaringan:      c.Query("jaringan"),
 	}
 
 	data, err := h.service.GetAll(ctx, limit, offset, filter, c.Value("user"))

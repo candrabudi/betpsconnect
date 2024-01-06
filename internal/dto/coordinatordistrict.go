@@ -39,4 +39,12 @@ type (
 		KorcamDistrict string `json:"korcam_district"`
 		KorcamNetwork  string `json:"korcam_network"`
 	}
+
+	CoordinationDistrictFilter struct {
+		NamaKabupaten string `json:"nama_kabupaten"`
+		NamaKecamatan string `json:"nama_kecamatan"`
+		NamaKelurahan string `json:"nama_kelurahan"`
+		Jaringan      string `json:"jaringan"`
+		Nama          string `json:"nama"`
+	}
 )

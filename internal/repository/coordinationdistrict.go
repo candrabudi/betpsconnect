@@ -18,7 +18,7 @@ import (
 
 type CoordinationDistrict interface {
 	Store(ctx context.Context, newData dto.PayloadStoreCoordinatorDistrict) error
-	GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultAllCoordinatorDistrict, error)
+	GetAll(ctx context.Context, limit, offset int64, filter dto.CoordinationDistrictFilter) (dto.ResultAllCoordinatorDistrict, error)
 	Update(ctx context.Context, ID int, updatedData dto.PayloadUpdateCoordinatorDistrict) error
 }
 
@@ -32,7 +32,7 @@ func NewCoordinationDistrictRepository(mongoConn *mongo.Client) CoordinationDist
 	}
 }
 
-func (cd *coordinationdistrict) GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultAllCoordinatorDistrict, error) {
+func (cd *coordinationdistrict) GetAll(ctx context.Context, limit, offset int64, filter dto.CoordinationDistrictFilter) (dto.ResultAllCoordinatorDistrict, error) {
 
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collectionName := "coordination_district"
@@ -49,6 +49,10 @@ func (cd *coordinationdistrict) GetAll(ctx context.Context, limit, offset int64,
 
 	if filter.NamaKecamatan != "" {
 		matchStage["korcam_district"] = filter.NamaKecamatan
+	}
+
+	if filter.Jaringan != "" {
+		matchStage["korcam_network"] = filter.Jaringan
 	}
 
 	if filter.Nama != "" {
@@ -113,7 +117,7 @@ func (cd *coordinationdistrict) GetAll(ctx context.Context, limit, offset int64,
 	return result, nil
 }
 
-func (cd *coordinationdistrict) GetTotalFilteredCoordinationCount(ctx context.Context, filter dto.ResidentFilter) (int32, error) {
+func (cd *coordinationdistrict) GetTotalFilteredCoordinationCount(ctx context.Context, filter dto.CoordinationDistrictFilter) (int32, error) {
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collectionName := "coordination_district"
 
