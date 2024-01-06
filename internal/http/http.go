@@ -4,6 +4,7 @@ import (
 	City "betpsconnect/internal/app/city"
 	CoordinationCity "betpsconnect/internal/app/coordinationcity"
 	CoordinationDistrict "betpsconnect/internal/app/coordinationdistrict"
+	CoordinationSubdistrict "betpsconnect/internal/app/coordinationsubdistrict"
 	District "betpsconnect/internal/app/district"
 	Resident "betpsconnect/internal/app/resident"
 	SubDistrict "betpsconnect/internal/app/subdistrict"
@@ -36,6 +37,7 @@ func NewHttp(g *gin.Engine, f *factory.Factory) {
 	TrueResident.NewHandler(f).Router(v1.Group("/validresident"))
 	CoordinationCity.NewHandler(f).Router(v1.Group("/kordinator/kabupaten"))
 	CoordinationDistrict.NewHandler(f).Router(v1.Group("/kordinator/kecamatan"))
+	CoordinationSubdistrict.NewHandler(f).Router(v1.Group("/kordinator/kelurahan"))
 }
 
 func Index(g *gin.Engine) {
@@ -43,7 +45,7 @@ func Index(g *gin.Engine) {
 		context.JSON(200, struct {
 			Name string `json:"name"`
 		}{
-			Name: "Tps Connect",
+			Name: "Kaznet",
 		})
 	})
 }
