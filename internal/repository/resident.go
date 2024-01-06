@@ -6,6 +6,7 @@ import (
 	"betpsconnect/pkg/util"
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
 	"time"
 
@@ -305,7 +306,8 @@ func (r *resident) GetTotalFilteredResidentCount(ctx context.Context, filter dto
 }
 
 func (r *resident) DetailResident(ctx context.Context, ResidentID int) (dto.DetailResident, error) {
-	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	fmt.Println("kodok")
+	dbName := util.GetEnv("MONGO_DB_NAME", "kaznet")
 	collectionName := "residents"
 
 	collection := r.MongoConn.Database(dbName).Collection(collectionName)

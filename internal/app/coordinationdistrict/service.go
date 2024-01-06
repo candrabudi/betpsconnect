@@ -7,6 +7,7 @@ import (
 	"betpsconnect/internal/repository"
 	"context"
 	"errors"
+	"fmt"
 )
 
 type service struct {
@@ -14,7 +15,7 @@ type service struct {
 }
 
 type Service interface {
-	GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultAllCoordinatorCity, error)
+	GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultAllCoordinatorDistrict, error)
 	Store(ctx context.Context, payload dto.PayloadStoreCoordinatorDistrict) error
 	Update(ctx context.Context, ID int, payload dto.PayloadUpdateCoordinatorDistrict) error
 }
@@ -25,27 +26,29 @@ func NewService(f *factory.Factory) Service {
 	}
 }
 
-func (s *service) GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultAllCoordinatorCity, error) {
+func (s *service) GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultAllCoordinatorDistrict, error) {
 	user, ok := userSess.(model.User)
 	if !ok {
-		return dto.ResultAllCoordinatorCity{}, errors.New("invalid user session data")
+		return dto.ResultAllCoordinatorDistrict{}, errors.New("invalid user session data")
 	}
 
 	if user.Role == "admin" {
 		filter.NamaKabupaten = user.Regency
 	}
 
+	fmt.Println(filter)
+
 	resultTpsResidents, err := s.coordinationDistrict.GetAll(ctx, limit, offset, filter)
 	if err != nil {
-		return dto.ResultAllCoordinatorCity{
-			Items:    []dto.FindCoordinatorCity{},
+		return dto.ResultAllCoordinatorDistrict{
+			Items:    []dto.FindCoordinatorDistrict{},
 			Metadata: dto.MetaData{},
 		}, err
 	}
 
 	if len(resultTpsResidents.Items) == 0 {
-		return dto.ResultAllCoordinatorCity{
-			Items:    []dto.FindCoordinatorCity{},
+		return dto.ResultAllCoordinatorDistrict{
+			Items:    []dto.FindCoordinatorDistrict{},
 			Metadata: dto.MetaData{},
 		}, nil
 	}

@@ -13,6 +13,7 @@ type CoordinationDistrict struct {
 	KorcamAddress  string    `bson:"korcam_address,empty"`
 	KorcamDistrict string    `bson:"korcam_district,empty"`
 	KorcamCity     string    `bson:"korcam_city,empty"`
+	KorcamNetwork  string    `bson:"korcam_network,empty"`
 	CreatedAt      time.Time `bson:"created_at,empty"`
 	UpdatedAt      time.Time `bson:"updated_at,empty"`
 }

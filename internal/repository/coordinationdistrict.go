@@ -18,7 +18,7 @@ import (
 
 type CoordinationDistrict interface {
 	Store(ctx context.Context, newData dto.PayloadStoreCoordinatorDistrict) error
-	GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultAllCoordinatorCity, error)
+	GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultAllCoordinatorDistrict, error)
 	Update(ctx context.Context, ID int, updatedData dto.PayloadUpdateCoordinatorDistrict) error
 }
 
@@ -32,7 +32,7 @@ func NewCoordinationDistrictRepository(mongoConn *mongo.Client) CoordinationDist
 	}
 }
 
-func (cd *coordinationdistrict) GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultAllCoordinatorCity, error) {
+func (cd *coordinationdistrict) GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultAllCoordinatorDistrict, error) {
 
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collectionName := "coordination_district"
@@ -43,11 +43,12 @@ func (cd *coordinationdistrict) GetAll(ctx context.Context, limit, offset int64,
 	matchStage := bson.M{}
 
 	if filter.NamaKabupaten != "" {
-		matchStage["nama_kabupaten"] = filter.NamaKabupaten
+		fmt.Println(filter.NamaKabupaten)
+		matchStage["korcam_city"] = filter.NamaKabupaten
 	}
 
 	if filter.NamaKecamatan != "" {
-		matchStage["nama_kecamatan"] = filter.NamaKecamatan
+		matchStage["korcam_district"] = filter.NamaKecamatan
 	}
 
 	if filter.Nama != "" {
@@ -61,14 +62,16 @@ func (cd *coordinationdistrict) GetAll(ctx context.Context, limit, offset int64,
 
 	projectStage := bson.M{
 		"$project": bson.M{
-			"_id":            1,
-			"id":             1,
-			"korcam_name":    1,
-			"korcam_nik":     1,
-			"korcam_phone":   1,
-			"korcam_age":     1,
-			"korcam_address": 1,
-			"korcam_city":    1,
+			"_id":             1,
+			"id":              1,
+			"korcam_name":     1,
+			"korcam_nik":      1,
+			"korcam_phone":    1,
+			"korcam_age":      1,
+			"korcam_address":  1,
+			"korcam_city":     1,
+			"korcam_district": 1,
+			"korcam_network":  1,
 		},
 	}
 
@@ -79,21 +82,21 @@ func (cd *coordinationdistrict) GetAll(ctx context.Context, limit, offset int64,
 
 	cursor, err := collection.Aggregate(ctx, pipeline)
 	if err != nil {
-		return dto.ResultAllCoordinatorCity{}, err
+		return dto.ResultAllCoordinatorDistrict{}, err
 	}
 	defer cursor.Close(ctx)
 
-	var dataAllResident []dto.FindCoordinatorCity
+	var dataAllResident []dto.FindCoordinatorDistrict
 	if err = cursor.All(ctx, &dataAllResident); err != nil {
-		return dto.ResultAllCoordinatorCity{}, err
+		return dto.ResultAllCoordinatorDistrict{}, err
 	}
 
 	totalResults, err := cd.GetTotalFilteredCoordinationCount(ctx, filter)
 	if err != nil {
-		return dto.ResultAllCoordinatorCity{}, err
+		return dto.ResultAllCoordinatorDistrict{}, err
 	}
 
-	result := dto.ResultAllCoordinatorCity{
+	result := dto.ResultAllCoordinatorDistrict{
 		Items: dataAllResident,
 		Metadata: dto.MetaData{
 			TotalResults: int(totalResults),
@@ -104,7 +107,7 @@ func (cd *coordinationdistrict) GetAll(ctx context.Context, limit, offset int64,
 	}
 
 	if totalResults == 0 {
-		result.Items = []dto.FindCoordinatorCity{}
+		result.Items = []dto.FindCoordinatorDistrict{}
 	}
 
 	return result, nil
@@ -172,20 +175,8 @@ func (cd *coordinationdistrict) Store(ctx context.Context, newData dto.PayloadSt
 	}
 	newID := lastData.ID + 1
 
-	collectionCity := cd.MongoConn.Database(dbName).Collection("coordination_city")
-	filter := bson.M{"id": newData.KorkabID}
-
-	var dCoordinationCity model.CoordinationCity
-	err = collectionCity.FindOne(ctx, filter).Decode(&dCoordinationCity)
-	if err != nil {
-		fmt.Println(newData.KorkabID)
-		return errors.New("No Data Korkab")
-	}
-
 	TrueResident := model.CoordinationDistrict{
 		ID:             newID,
-		KorkabID:       newData.KorkabID,
-		KorkabName:     dCoordinationCity.KorkabName,
 		KorcamName:     newData.KorcamName,
 		KorcamNik:      newData.KorcamNik,
 		KorcamPhone:    newData.KorcamPhone,
@@ -193,6 +184,7 @@ func (cd *coordinationdistrict) Store(ctx context.Context, newData dto.PayloadSt
 		KorcamAddress:  newData.KorcamAddress,
 		KorcamCity:     newData.KorcamCity,
 		KorcamDistrict: newData.KorcamDistrict,
+		KorcamNetwork:  newData.KorcamNetwork,
 		CreatedAt:      time.Now(),
 		UpdatedAt:      time.Now(),
 	}

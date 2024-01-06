@@ -2,22 +2,23 @@ package dto
 
 type (
 	ResultAllCoordinatorDistrict struct {
-		Items    []FindCoordinatorCity `json:"items"`
-		Metadata MetaData              `json:"metadata"`
+		Items    []FindCoordinatorDistrict `json:"items"`
+		Metadata MetaData                  `json:"metadata"`
 	}
 
 	FindCoordinatorDistrict struct {
 		ID            int    `bson:"id,omitempty" json:"id"`
-		Nama          string `bson:"coordinator_name,omitempty" json:"name"`
-		NoHandphone   string `bson:"coordinator_phone,omitempty" json:"no_handphone"`
-		Nik           string `bson:"coordinator_nik,omitempty" json:"nik"`
-		Usia          int    `bson:"coordinator_age,omitempty" json:"age"`
-		Alamat        string `bson:"coordinator_address,omitempty" json:"address"`
-		NamaKabupaten string `bson:"coordinator_city,omitempty" json:"city"`
+		Nama          string `bson:"korcam_name,omitempty" json:"name"`
+		NoHandphone   string `bson:"korcam_phone,omitempty" json:"no_handphone"`
+		Nik           string `bson:"korcam_nik,omitempty" json:"nik"`
+		Usia          int    `bson:"korcam_age,omitempty" json:"age"`
+		Alamat        string `bson:"korcam_address,omitempty" json:"address"`
+		NamaKabupaten string `bson:"korcam_city,omitempty" json:"city"`
+		NamaKecamatan string `bson:"korcam_district,omitempty" json:"district"`
+		Jaringan      string `bson:"korcam_network,omitempty" json:"network"`
 	}
 
 	PayloadStoreCoordinatorDistrict struct {
-		KorkabID       int    `json:"korkab_id"`
 		KorcamName     string `json:"korcam_name"`
 		KorcamNik      string `json:"korcam_nik"`
 		KorcamPhone    string `json:"korcam_phone"`
@@ -25,6 +26,7 @@ type (
 		KorcamAddress  string `json:"korcam_address"`
 		KorcamCity     string `json:"korcam_city"`
 		KorcamDistrict string `json:"korcam_district"`
+		KorcamNetwork  string `json:"korcam_network"`
 	}
 
 	PayloadUpdateCoordinatorDistrict struct {
@@ -35,5 +37,6 @@ type (
 		KorcamAddress  string `json:"korcam_address"`
 		KorcamCity     string `json:"korcam_city"`
 		KorcamDistrict string `json:"korcam_district"`
+		KorcamNetwork  string `json:"korcam_network"`
 	}
 )
