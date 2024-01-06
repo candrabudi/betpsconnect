@@ -41,6 +41,10 @@ func (cc *coordinationcity) GetAll(ctx context.Context, limit, offset int64, fil
 
 	matchStage := bson.M{}
 
+	if filter.NamaKabupaten != "" {
+		matchStage["korcam_city"] = filter.NamaKabupaten
+	}
+
 	if filter.Nama != "" {
 		regexPattern := regexp.QuoteMeta(filter.Nama)
 		matchStage["korkab_name"] = primitive.Regex{Pattern: regexPattern, Options: "i"}
