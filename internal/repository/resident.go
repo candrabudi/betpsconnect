@@ -516,7 +516,7 @@ func (r *resident) ResidentValidate(ctx context.Context, newData dto.PayloadUpda
 					City:        dresident.NamaKabupaten,
 					District:    dresident.NamaKecamatan,
 					SubDistrict: dresident.NamaKelurahan,
-					Tps:         tps,
+					Tps:         removeLeadingZeros(tps),
 					Jaringan:    dataResident.Jaringan,
 					IsManual:    0,
 					CreatedAt:   time.Now(),
@@ -603,7 +603,7 @@ func (r *resident) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsBy
 		var nonEmptyResults []string
 		for _, tps := range result.TPS {
 			if tps != "" {
-				nonEmptyResults = append(nonEmptyResults, tps)
+				nonEmptyResults = append(nonEmptyResults, removeLeadingZeros(tps))
 			}
 		}
 

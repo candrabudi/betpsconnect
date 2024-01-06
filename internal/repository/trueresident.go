@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -54,6 +55,10 @@ func (tr *trueresident) GetAll(ctx context.Context, limit, offset int64, filter 
 
 	if filter.NamaKelurahan != "" {
 		matchStage["subdistrict"] = filter.NamaKelurahan
+	}
+
+	if filter.Jaringan != "" {
+		matchStage["network"] = filter.Jaringan
 	}
 
 	if filter.TPS != "" {
@@ -151,7 +156,7 @@ func (tr *trueresident) Update(ctx context.Context, ID int, updatedData dto.Payl
 			"subdistrict":  updatedData.Subdistrict,
 			"district":     updatedData.District,
 			"city":         updatedData.City,
-			"tps":          updatedData.TPS,
+			"tps":          removeLeadingZeros(updatedData.TPS),
 		},
 	}
 
@@ -241,7 +246,6 @@ func (tr *trueresident) Store(ctx context.Context, newData dto.TrueResidentPaylo
 		return err
 	}
 	newUserID := person.ID + 1
-
 	TrueResident := model.TrueResident{
 		ID:          newUserID,
 		FullName:    newData.FullName,
@@ -253,7 +257,7 @@ func (tr *trueresident) Store(ctx context.Context, newData dto.TrueResidentPaylo
 		District:    newData.District,
 		SubDistrict: newData.Subdistrict,
 		Jaringan:    newData.Jaringan,
-		Tps:         newData.TPS,
+		Tps:         removeLeadingZeros(newData.TPS),
 		IsManual:    1,
 		CreatedAt:   time.Now(),
 		UpdatedAt:   time.Now(),
@@ -265,6 +269,13 @@ func (tr *trueresident) Store(ctx context.Context, newData dto.TrueResidentPaylo
 	}
 
 	return nil
+}
+
+func removeLeadingZeros(s string) string {
+	for strings.HasPrefix(s, "0") && len(s) > 1 {
+		s = s[1:]
+	}
+	return s
 }
 
 func (tr *trueresident) getLastPerson(ctx context.Context, collection *mongo.Collection) (model.Resident, error) {

@@ -24,6 +24,7 @@ type (
 		NamaKabupaten string `json:"nama_kabupaten"`
 		NamaKecamatan string `json:"nama_kecamatan"`
 		NamaKelurahan string `json:"nama_kelurahan"`
+		Jaringan      string `json:"jaringan"`
 		TPS           string `json:"tps"`
 		Nama          string `json:"nama"`
 		IsManual      string `json:"is_manual"`

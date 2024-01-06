@@ -38,6 +38,7 @@ func (h *handler) GetTrueResidents(c *gin.Context) {
 		NamaKabupaten: c.Query("nama_kabupaten"),
 		NamaKecamatan: c.Query("nama_kecamatan"),
 		NamaKelurahan: c.Query("nama_kelurahan"),
+		Jaringan:      c.Query("jaringan"),
 		TPS:           c.Query("tps"),
 		IsManual:      c.Query("is_manual"),
 		Nama:          c.Query("nama"),
