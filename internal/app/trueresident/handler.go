@@ -105,3 +105,22 @@ func (h *handler) Update(c *gin.Context) {
 	response := util.APIResponse("Success update valid resident", http.StatusOK, "success", nil)
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *handler) GetTpsOnValidResident(c *gin.Context) {
+	ctx := c.Request.Context()
+	filter := dto.FindTpsByDistrict{
+		NamaKabupaten: c.Query("nama_kabupaten"),
+		NamaKecamatan: c.Query("nama_kecamatan"),
+		NamaKelurahan: c.Query("nama_kelurahan"),
+	}
+
+	data, err := h.service.GetTpsOnValidResident(ctx, filter)
+	if err != nil {
+		response := util.APIResponse("Failed to retrieve tps : "+err.Error(), http.StatusInternalServerError, "failed", nil)
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	response := util.APIResponse("Success get data tps", http.StatusOK, "success", data)
+	c.JSON(http.StatusOK, response)
+}

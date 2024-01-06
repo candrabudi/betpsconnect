@@ -21,6 +21,7 @@ type TrueResident interface {
 	Store(ctx context.Context, newData dto.TrueResidentPayload) error
 	GetAll(ctx context.Context, limit, offset int64, filter dto.TrueResidentFilter) (dto.ResultAllTrueResident, error)
 	Update(ctx context.Context, ID int, updatedData dto.PayloadUpdateTrueResident) error
+	GetTpsOnValidResident(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error)
 }
 
 type trueresident struct {
@@ -278,4 +279,71 @@ func (tr *trueresident) getLastPerson(ctx context.Context, collection *mongo.Col
 	}
 
 	return person, nil
+}
+
+func (tr *trueresident) GetTpsOnValidResident(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error) {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "true_residents"
+
+	collection := tr.MongoConn.Database(dbName).Collection(collectionName)
+
+	pipeline := bson.A{
+		bson.M{
+			"$match": bson.M{
+				"city":        filter.NamaKabupaten,
+				"district":    filter.NamaKecamatan,
+				"subdistrict": filter.NamaKelurahan,
+			},
+		},
+		bson.M{
+			"$group": bson.M{
+				"_id": "$tps",
+			},
+		},
+		bson.M{
+			"$sort": bson.M{"_id": 1},
+		},
+		bson.M{
+			"$group": bson.M{
+				"_id": nil,
+				"tps": bson.M{"$push": "$_id"},
+			},
+		},
+	}
+
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var results []string
+
+	if cursor.Next(ctx) {
+		var result struct {
+			TPS []string `bson:"tps"`
+		}
+		if err := cursor.Decode(&result); err != nil {
+			return nil, err
+		}
+
+		var nonEmptyResults []string
+		for _, tps := range result.TPS {
+			if tps != "" {
+				nonEmptyResults = append(nonEmptyResults, tps)
+			}
+		}
+
+		if len(nonEmptyResults) == 0 {
+			return []string{}, nil
+		}
+
+		return nonEmptyResults, nil
+	}
+
+	if err := cursor.Err(); err != nil {
+		return nil, err
+	}
+
+	return results, nil
 }
