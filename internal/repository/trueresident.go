@@ -12,6 +12,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/360EntSecGroup-Skylar/excelize"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -24,6 +25,7 @@ type TrueResident interface {
 	Update(ctx context.Context, ID int, updatedData dto.PayloadUpdateTrueResident) error
 	GetTpsOnValidResident(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error)
 	Delete(ctx context.Context, ID int) error
+	Export(ctx context.Context, filter dto.TrueResidentFilter) ([]byte, error)
 }
 
 type trueresident struct {
@@ -257,6 +259,7 @@ func (tr *trueresident) Store(ctx context.Context, newData dto.TrueResidentPaylo
 		City:        newData.City,
 		District:    newData.District,
 		SubDistrict: newData.Subdistrict,
+		Address:     newData.Address,
 		Jaringan:    newData.Jaringan,
 		Tps:         removeLeadingZeros(newData.TPS),
 		IsManual:    1,
@@ -402,4 +405,116 @@ func (tr *trueresident) Delete(ctx context.Context, ID int) error {
 	}
 
 	return nil
+}
+
+func (tr *trueresident) Export(ctx context.Context, filter dto.TrueResidentFilter) ([]byte, error) {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "true_residents"
+
+	collection := tr.MongoConn.Database(dbName).Collection(collectionName)
+	pipeline := make([]bson.M, 0)
+
+	matchStage := bson.M{}
+
+	if filter.NamaKabupaten != "" {
+		matchStage["city"] = filter.NamaKabupaten
+	}
+
+	if filter.NamaKecamatan != "" {
+		matchStage["district"] = filter.NamaKecamatan
+	}
+
+	if filter.NamaKelurahan != "" {
+		matchStage["subdistrict"] = filter.NamaKelurahan
+	}
+
+	if filter.Jaringan != "" {
+		matchStage["network"] = filter.Jaringan
+	}
+
+	if filter.TPS != "" {
+		matchStage["tps"] = filter.TPS
+	}
+
+	if filter.Nama != "" {
+		regexPattern := regexp.QuoteMeta(filter.Nama)
+		matchStage["full_name"] = primitive.Regex{Pattern: regexPattern, Options: "i"}
+	}
+
+	if len(matchStage) > 0 {
+		pipeline = append(pipeline, bson.M{"$match": matchStage})
+	}
+
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var dataAllResident []dto.ExportTrueAllResident
+	if err = cursor.All(ctx, &dataAllResident); err != nil {
+		return nil, err
+	}
+
+	xlsx := excelize.NewFile()
+	sheetName := "Sheet1"
+	xlsx.NewSheet(sheetName)
+
+	if err := tr.setHeaderAndStyle(xlsx, sheetName); err != nil {
+		return nil, err
+	}
+
+	tr.setDataRows(xlsx, sheetName, dataAllResident)
+
+	fileBytes, err := xlsx.WriteToBuffer()
+	if err != nil {
+		return nil, err
+	}
+
+	return fileBytes.Bytes(), nil
+}
+
+func (tr *trueresident) setHeaderAndStyle(xlsx *excelize.File, sheetName string) error {
+	headers := []string{"NAMA", "NIK", "NOMOR HANDPHONE", "JK", "UMUR", "ALAMAT", "KABUPATEN", "KECAMATAN", "KELURAHAN", "TPS", "JARINGAN", "TANGGAL BUAT", "TANGGAL UPDATE"}
+	widths := []float64{30, 30, 25, 10, 10, 35, 20, 20, 20, 15, 15, 20, 20}
+
+	style, err := xlsx.NewStyle(`{"alignment":{"horizontal":"center"}}`)
+	if err != nil {
+		return err
+	}
+
+	for i, header := range headers {
+		cell := fmt.Sprintf("%c%d", 'A'+i, 1)
+		xlsx.SetCellValue(sheetName, cell, header)
+		xlsx.SetCellStyle(sheetName, cell, cell, style)
+		xlsx.SetColWidth(sheetName, cell[:1], cell[:1], widths[i])
+	}
+	return nil
+}
+
+func (tr *trueresident) setDataRows(xlsx *excelize.File, sheetName string, dataTrueResident []dto.ExportTrueAllResident) {
+	style, _ := xlsx.NewStyle(`{"alignment":{"horizontal":"center"}}`)
+
+	for i, data := range dataTrueResident {
+		rowData := []interface{}{
+			data.Nama,
+			data.Nik,
+			data.NoHandphone,
+			data.JenisKelamin,
+			data.Usia,
+			data.Address,
+			data.NamaKabupaten,
+			data.NamaKecamatan,
+			data.NamaKelurahan,
+			data.Tps,
+			data.Jaringan,
+			data.CreatedAt.Format("2006-01-02"),
+			data.UpdatedAt.Format("2006-01-02"),
+		}
+		for j, value := range rowData {
+			cell := fmt.Sprintf("%c%d", 'A'+j, i+2)
+			xlsx.SetCellValue(sheetName, cell, value)
+			xlsx.SetCellStyle(sheetName, cell, cell, style)
+		}
+	}
 }

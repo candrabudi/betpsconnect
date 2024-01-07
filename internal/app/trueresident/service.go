@@ -19,6 +19,7 @@ type Service interface {
 	GetAll(ctx context.Context, limit, offset int64, filter dto.TrueResidentFilter, userSess any) (dto.ResultAllTrueResident, error)
 	GetTpsOnValidResident(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error)
 	Delete(ctx context.Context, ID int) error
+	Export(ctx context.Context, filter dto.TrueResidentFilter, userSess any) ([]byte, error)
 }
 
 func NewService(f *factory.Factory) Service {
@@ -42,6 +43,24 @@ func (s *service) GetAll(ctx context.Context, limit, offset int64, filter dto.Tr
 		return dto.ResultAllTrueResident{}, err
 	}
 	return resultTpsResidents, nil
+}
+
+func (s *service) Export(ctx context.Context, filter dto.TrueResidentFilter, userSess any) ([]byte, error) {
+	user, ok := userSess.(model.User)
+	if !ok {
+		return nil, errors.New("invalid user session data")
+	}
+
+	if user.Role == "admin" {
+		filter.NamaKabupaten = user.Regency
+	}
+
+	export, err := s.trueResidentRepository.Export(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	return export, nil
 }
 
 func (s *service) Store(ctx context.Context, payload dto.TrueResidentPayload) error {

@@ -1,5 +1,7 @@
 package dto
 
+import "time"
+
 type (
 	TrueResidentPayload struct {
 		FullName    string `json:"full_name" validate:"required"`
@@ -57,6 +59,22 @@ type (
 		NoHandphone   string `bson:"no_handphone,omitempty" json:"telp"`
 		Jaringan      string `bson:"network,empty" json:"jaringan"`
 		IsManual      int    `bson:"is_manual,omitempty" json:"is_manual"`
+	}
+
+	ExportTrueAllResident struct {
+		Nama          string    `bson:"full_name,omitempty" json:"nama"`
+		JenisKelamin  string    `bson:"gender,omitempty" json:"jenis_kelamin"`
+		NamaKabupaten string    `bson:"city,omitempty" json:"nama_kabupaten"`
+		NamaKecamatan string    `bson:"district,omitempty" json:"nama_kecamatan"`
+		NamaKelurahan string    `bson:"subdistrict,omitempty" json:"nama_kelurahan"`
+		Address       string    `bson:"address,omitempty" json:"alamat"`
+		Nik           string    `bson:"nik,omitempty" json:"nik"`
+		Usia          int       `bson:"age,omitempty" json:"usia"`
+		Tps           string    `bson:"tps,omitempty" json:"tps"`
+		NoHandphone   string    `bson:"no_handphone,omitempty" json:"telp"`
+		Jaringan      string    `bson:"network,empty" json:"jaringan"`
+		CreatedAt     time.Time `bson:"created_at,omitempty" json:"created_at"`
+		UpdatedAt     time.Time `bson:"updated_at,omitempty" json:"updated_at"`
 	}
 
 	DetailTrueResident struct {
