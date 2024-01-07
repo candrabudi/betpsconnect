@@ -147,7 +147,7 @@ func (cs *coordinationtps) GetTotalFilteredCoordinationCount(ctx context.Context
 	}
 
 	if filter.Jaringan != "" {
-		filterOptions["kortps_jaringan"] = filter.Jaringan
+		filterOptions["kortps_network"] = filter.Jaringan
 	}
 
 	if filter.Tps != "" {
