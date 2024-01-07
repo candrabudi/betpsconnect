@@ -19,9 +19,9 @@ type (
 	}
 
 	CoordinationCityFilter struct {
-		Nama          string `json:"nama"`
-		NamaKabupaten string `json:"nama_kabupaten"`
-		Jaringan      string `json:"jaringan"`
+		Nama       string `json:"nama"`
+		KorkabCity string `bson:"korkab_city,omitempty" json:"nama_kabupaten"`
+		Jaringan   string `json:"jaringan"`
 	}
 
 	PayloadStoreCoordinatorCity struct {

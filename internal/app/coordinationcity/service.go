@@ -32,7 +32,7 @@ func (s *service) GetListCoordinationCity(ctx context.Context, limit, offset int
 	}
 
 	if user.Role == "admin" {
-		filter.NamaKabupaten = user.Regency
+		filter.KorkabCity = user.Regency
 	}
 
 	resultTpsResidents, err := s.coordinationCityRepository.GetAll(ctx, limit, offset, filter)

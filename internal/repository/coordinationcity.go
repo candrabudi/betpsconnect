@@ -6,6 +6,7 @@ import (
 	"betpsconnect/pkg/util"
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
 	"time"
 
@@ -32,7 +33,6 @@ func NewCoordinationCityRepository(mongoConn *mongo.Client) CoordinationCity {
 }
 
 func (cc *coordinationcity) GetAll(ctx context.Context, limit, offset int64, filter dto.CoordinationCityFilter) (dto.ResultAllCoordinatorCity, error) {
-
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collectionName := "coordination_city"
 
@@ -41,35 +41,18 @@ func (cc *coordinationcity) GetAll(ctx context.Context, limit, offset int64, fil
 
 	matchStage := bson.M{}
 
-	if filter.NamaKabupaten != "" {
-		matchStage["korkab_city"] = filter.NamaKabupaten
+	if filter.KorkabCity != "" {
+		matchStage["korkab_city"] = filter.KorkabCity
 	}
 
 	if filter.Nama != "" {
 		regexPattern := regexp.QuoteMeta(filter.Nama)
 		matchStage["korkab_name"] = primitive.Regex{Pattern: regexPattern, Options: "i"}
 	}
-
+	fmt.Println(matchStage)
 	if len(matchStage) > 0 {
 		pipeline = append(pipeline, bson.M{"$match": matchStage})
 	}
-
-	projectStage := bson.M{
-		"$project": bson.M{
-			"_id":            1,
-			"id":             1,
-			"korkab_name":    1,
-			"korkab_nik":     1,
-			"korkab_phone":   1,
-			"korkab_age":     1,
-			"korkab_gender":  1,
-			"korkab_address": 1,
-			"korkab_city":    1,
-			"korkab_network": 1,
-		},
-	}
-
-	pipeline = append(pipeline, projectStage)
 
 	pipeline = append(pipeline, bson.M{"$skip": offset})
 	pipeline = append(pipeline, bson.M{"$limit": limit})
@@ -115,8 +98,9 @@ func (cc *coordinationcity) GetTotalFilteredCoordinationCount(ctx context.Contex
 
 	filterOptions := bson.M{}
 
-	if filter.NamaKabupaten != "" {
-		filterOptions["kordes_city"] = filter.NamaKabupaten
+	if filter.KorkabCity != "" {
+		regexPattern := regexp.QuoteMeta(filter.KorkabCity)
+		filterOptions["$or"] = []bson.M{{"korkab_city": primitive.Regex{Pattern: regexPattern, Options: "i"}}}
 	}
 
 	if filter.Jaringan != "" {
