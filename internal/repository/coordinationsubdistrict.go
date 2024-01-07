@@ -51,7 +51,7 @@ func (cs *coordinationsubdistrict) GetAll(ctx context.Context, limit, offset int
 	}
 
 	if filter.NamaKelurahan != "" {
-		matchStage["kordes_kelurahan"] = filter.NamaKelurahan
+		matchStage["kordes_subdistrict"] = filter.NamaKelurahan
 	}
 
 	if filter.Jaringan != "" {

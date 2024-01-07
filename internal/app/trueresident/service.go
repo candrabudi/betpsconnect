@@ -18,6 +18,7 @@ type Service interface {
 	Update(ctx context.Context, ID int, payload dto.PayloadUpdateTrueResident) error
 	GetAll(ctx context.Context, limit, offset int64, filter dto.TrueResidentFilter, userSess any) (dto.ResultAllTrueResident, error)
 	GetTpsOnValidResident(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error)
+	Delete(ctx context.Context, ID int) error
 }
 
 func NewService(f *factory.Factory) Service {
@@ -72,4 +73,13 @@ func (s *service) GetTpsOnValidResident(ctx context.Context, filter dto.FindTpsB
 		return []string{}, nil
 	}
 	return resultTps, nil
+}
+
+func (s *service) Delete(ctx context.Context, ID int) error {
+	err := s.trueResidentRepository.Delete(ctx, ID)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

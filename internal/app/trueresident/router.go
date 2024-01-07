@@ -11,5 +11,6 @@ func (h *handler) Router(g *gin.RouterGroup) {
 	g.GET("/list", h.GetTrueResidents)
 	g.POST("/store", h.Store)
 	g.PUT("/update/:id", h.Update)
+	g.DELETE("/delete/:id", h.Delete)
 	g.GET("/tps/subdistrict", h.GetTpsOnValidResident)
 }

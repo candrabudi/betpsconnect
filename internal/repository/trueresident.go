@@ -23,6 +23,7 @@ type TrueResident interface {
 	GetAll(ctx context.Context, limit, offset int64, filter dto.TrueResidentFilter) (dto.ResultAllTrueResident, error)
 	Update(ctx context.Context, ID int, updatedData dto.PayloadUpdateTrueResident) error
 	GetTpsOnValidResident(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error)
+	Delete(ctx context.Context, ID int) error
 }
 
 type trueresident struct {
@@ -357,4 +358,48 @@ func (tr *trueresident) GetTpsOnValidResident(ctx context.Context, filter dto.Fi
 	}
 
 	return results, nil
+}
+
+func (tr *trueresident) Delete(ctx context.Context, ID int) error {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "true_residents"
+
+	collection := tr.MongoConn.Database(dbName).Collection(collectionName)
+	filter := bson.M{"id": ID}
+
+	var resident model.TrueResident
+	err := collection.FindOne(ctx, filter).Decode(&resident)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return errors.New("data not found")
+		}
+		return err
+	}
+
+	NIK := resident.Nik
+
+	collectionResident := "residents"
+
+	collectionUpdateResident := tr.MongoConn.Database(dbName).Collection(collectionResident)
+	filterUpdate := bson.M{"nik": NIK}
+
+	update := bson.M{
+		"$set": bson.M{
+			"is_verification": 0,
+			"is_delete":       0,
+			"updated_at":      time.Now(),
+		},
+	}
+
+	_, err = collectionUpdateResident.UpdateOne(ctx, filterUpdate, update)
+	if err != nil {
+		return err
+	}
+
+	_, err = collection.DeleteOne(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

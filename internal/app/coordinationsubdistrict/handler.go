@@ -38,6 +38,7 @@ func (h *handler) GetAll(c *gin.Context) {
 		Nama:          c.Query("nama"),
 		NamaKabupaten: c.Query("nama_kabupaten"),
 		NamaKecamatan: c.Query("nama_kecamatan"),
+		NamaKelurahan: c.Query("nama_kelurahan"),
 		Jaringan:      c.Query("jaringan"),
 	}
 

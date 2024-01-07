@@ -125,3 +125,24 @@ func (h *handler) GetTpsOnValidResident(c *gin.Context) {
 	response := util.APIResponse("Success get data tps", http.StatusOK, "success", data)
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *handler) Delete(c *gin.Context) {
+	ID, _ := strconv.Atoi(c.Param("id"))
+
+	if ID == 0 {
+		response := util.APIResponse("Please input ID valid resident ", http.StatusBadRequest, "failed", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	err := h.service.Delete(c, ID)
+
+	if err != nil {
+		response := util.APIResponse(fmt.Sprintf("%s", err.Error()), http.StatusBadRequest, "failed", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := util.APIResponse("Success delete valid resident", http.StatusOK, "success", nil)
+	c.JSON(http.StatusOK, response)
+}
