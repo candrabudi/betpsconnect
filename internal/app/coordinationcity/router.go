@@ -11,4 +11,5 @@ func (h *handler) Router(g *gin.RouterGroup) {
 	g.GET("/list", h.GetListCoordinationCity)
 	g.POST("/store", h.Store)
 	g.PUT("/update/:id", h.Update)
+	g.DELETE("/delete/:id", h.Delete)
 }

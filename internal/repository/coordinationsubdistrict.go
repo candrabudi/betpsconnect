@@ -19,6 +19,7 @@ type CoordinationSubdistrict interface {
 	Store(ctx context.Context, newData dto.PayloadStoreCoordinatorSubdistrict) error
 	GetAll(ctx context.Context, limit, offset int64, filter dto.CoordinationSubdistrictFilter) (dto.ResultAllCoordinatorSubdistrict, error)
 	Update(ctx context.Context, ID int, updatedData dto.PayloadUpdateCoordinatorSubdistrict) error
+	Delete(ctx context.Context, ID int) error
 }
 
 type coordinationsubdistrict struct {
@@ -239,6 +240,21 @@ func (cs *coordinationsubdistrict) Update(ctx context.Context, ID int, updatedDa
 	}
 
 	_, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (cs *coordinationsubdistrict) Delete(ctx context.Context, ID int) error {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "coordination_subdistrict"
+
+	collection := cs.MongoConn.Database(dbName).Collection(collectionName)
+	filter := bson.M{"id": ID}
+
+	_, err := collection.DeleteOne(ctx, filter)
 	if err != nil {
 		return err
 	}

@@ -19,6 +19,7 @@ type CoordinationTps interface {
 	Store(ctx context.Context, newData dto.PayloadStoreCoordinatorTps) error
 	GetAll(ctx context.Context, limit, offset int64, filter dto.CoordinationTpsFilter) (dto.ResultAllCoordinatorTps, error)
 	Update(ctx context.Context, ID int, updatedData dto.PayloadUpdateCoordinatorTps) error
+	Delete(ctx context.Context, ID int) error
 }
 
 type coordinationtps struct {
@@ -250,6 +251,21 @@ func (cs *coordinationtps) Update(ctx context.Context, ID int, updatedData dto.P
 	}
 
 	_, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (cs *coordinationtps) Delete(ctx context.Context, ID int) error {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "coordination_tps"
+
+	collection := cs.MongoConn.Database(dbName).Collection(collectionName)
+	filter := bson.M{"id": ID}
+
+	_, err := collection.DeleteOne(ctx, filter)
 	if err != nil {
 		return err
 	}

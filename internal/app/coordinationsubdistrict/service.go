@@ -17,6 +17,7 @@ type Service interface {
 	GetAll(ctx context.Context, limit, offset int64, filter dto.CoordinationSubdistrictFilter, userSess any) (dto.ResultAllCoordinatorSubdistrict, error)
 	Store(ctx context.Context, payload dto.PayloadStoreCoordinatorSubdistrict) error
 	Update(ctx context.Context, ID int, payload dto.PayloadUpdateCoordinatorSubdistrict) error
+	Delete(ctx context.Context, ID int) error
 }
 
 func NewService(f *factory.Factory) Service {
@@ -64,6 +65,15 @@ func (s *service) Store(ctx context.Context, payload dto.PayloadStoreCoordinator
 
 func (s *service) Update(ctx context.Context, ID int, payload dto.PayloadUpdateCoordinatorSubdistrict) error {
 	err := s.coordinationSubdistrict.Update(ctx, ID, payload)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *service) Delete(ctx context.Context, ID int) error {
+	err := s.coordinationSubdistrict.Delete(ctx, ID)
 	if err != nil {
 		return err
 	}

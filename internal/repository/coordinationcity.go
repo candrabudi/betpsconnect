@@ -20,6 +20,7 @@ type CoordinationCity interface {
 	GetAll(ctx context.Context, limit, offset int64, filter dto.CoordinationCityFilter) (dto.ResultAllCoordinatorCity, error)
 	Store(ctx context.Context, newData dto.PayloadStoreCoordinatorCity) error
 	Update(ctx context.Context, ID int, updatedData dto.PayloadStoreCoordinatorCity) error
+	Delete(ctx context.Context, ID int) error
 }
 
 type coordinationcity struct {
@@ -197,6 +198,21 @@ func (cc *coordinationcity) Update(ctx context.Context, ID int, updatedData dto.
 	}
 
 	_, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (cc *coordinationcity) Delete(ctx context.Context, ID int) error {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "coordination_city"
+
+	collection := cc.MongoConn.Database(dbName).Collection(collectionName)
+	filter := bson.M{"id": ID}
+
+	_, err := collection.DeleteOne(ctx, filter)
 	if err != nil {
 		return err
 	}

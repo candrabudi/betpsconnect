@@ -19,6 +19,7 @@ type CoordinationDistrict interface {
 	Store(ctx context.Context, newData dto.PayloadStoreCoordinatorDistrict) error
 	GetAll(ctx context.Context, limit, offset int64, filter dto.CoordinationDistrictFilter) (dto.ResultAllCoordinatorDistrict, error)
 	Update(ctx context.Context, ID int, updatedData dto.PayloadUpdateCoordinatorDistrict) error
+	Delete(ctx context.Context, ID int) error
 }
 
 type coordinationdistrict struct {
@@ -228,6 +229,21 @@ func (cd *coordinationdistrict) Update(ctx context.Context, ID int, updatedData 
 	}
 
 	_, err := collection.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (cs *coordinationdistrict) Delete(ctx context.Context, ID int) error {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "coordination_district"
+
+	collection := cs.MongoConn.Database(dbName).Collection(collectionName)
+	filter := bson.M{"id": ID}
+
+	_, err := collection.DeleteOne(ctx, filter)
 	if err != nil {
 		return err
 	}

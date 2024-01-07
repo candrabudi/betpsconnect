@@ -17,6 +17,7 @@ type Service interface {
 	GetListCoordinationCity(ctx context.Context, limit, offset int64, filter dto.CoordinationCityFilter, userSess any) (dto.ResultAllCoordinatorCity, error)
 	Store(ctx context.Context, payload dto.PayloadStoreCoordinatorCity) error
 	Update(ctx context.Context, ID int, payload dto.PayloadStoreCoordinatorCity) error
+	Delete(ctx context.Context, ID int) error
 }
 
 func NewService(f *factory.Factory) Service {
@@ -65,6 +66,15 @@ func (s *service) Store(ctx context.Context, payload dto.PayloadStoreCoordinator
 func (s *service) Update(ctx context.Context, ID int, payload dto.PayloadStoreCoordinatorCity) error {
 
 	err := s.coordinationCityRepository.Update(ctx, ID, payload)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (s *service) Delete(ctx context.Context, ID int) error {
+	err := s.coordinationCityRepository.Delete(ctx, ID)
 	if err != nil {
 		return err
 	}

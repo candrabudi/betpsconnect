@@ -103,3 +103,24 @@ func (h *handler) Update(c *gin.Context) {
 	response := util.APIResponse("Success update coordination tps", http.StatusOK, "success", nil)
 	c.JSON(http.StatusOK, response)
 }
+
+func (h *handler) Delete(c *gin.Context) {
+	ID, _ := strconv.Atoi(c.Param("id"))
+
+	if ID == 0 {
+		response := util.APIResponse("Please input ID coordination TPS ", http.StatusBadRequest, "failed", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	err := h.service.Delete(c, ID)
+
+	if err != nil {
+		response := util.APIResponse(fmt.Sprintf("%s", err.Error()), http.StatusBadRequest, "failed", nil)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+
+	response := util.APIResponse("Success delete coordination tps", http.StatusOK, "success", nil)
+	c.JSON(http.StatusOK, response)
+}
