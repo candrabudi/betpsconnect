@@ -48,6 +48,10 @@ func (cc *coordinationcity) GetAll(ctx context.Context, limit, offset int64, fil
 		matchStage["korkab_city"] = filter.KorkabCity
 	}
 
+	if filter.Jaringan != "" {
+		matchStage["korkab_network"] = filter.Jaringan
+	}
+
 	if filter.Nama != "" {
 		regexPattern := regexp.QuoteMeta(filter.Nama)
 		matchStage["korkab_name"] = primitive.Regex{Pattern: regexPattern, Options: "i"}
