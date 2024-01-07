@@ -314,8 +314,8 @@ func (cd *coordinationdistrict) Export(ctx context.Context, filter dto.Coordinat
 }
 
 func (cd *coordinationdistrict) setHeaderAndStyle(xlsx *excelize.File, sheetName string) error {
-	headers := []string{"NAMA", "NIK", "NOMOR HANDPHONE", "UMUR", "ALAMAT", "KABUPATEN", "KECAMATAN", "JARINGAN", "TANGGAL BUAT", "TANGGAL UPDATE"}
-	widths := []float64{30, 30, 25, 10, 35, 20, 20, 15, 20, 20}
+	headers := []string{"NAMA", "NIK", "NOMOR HANDPHONE", "JK", "UMUR", "ALAMAT", "KABUPATEN", "KECAMATAN", "JARINGAN", "TANGGAL BUAT", "TANGGAL UPDATE"}
+	widths := []float64{30, 30, 25, 10, 10, 35, 20, 20, 15, 20, 20}
 
 	style, err := xlsx.NewStyle(`{"alignment":{"horizontal":"center"}}`)
 	if err != nil {
@@ -335,7 +335,7 @@ func (cd *coordinationdistrict) setDataRows(xlsx *excelize.File, sheetName strin
 	style, _ := xlsx.NewStyle(`{"alignment":{"horizontal":"center"}}`)
 
 	for i, data := range dataAllResident {
-		rowData := []interface{}{data.Nama, data.Nik, data.NoHandphone, data.Usia, data.Alamat, data.NamaKabupaten, data.NamaKecamatan, data.Jaringan, data.CreatedAt.Format("2006-01-02"), data.UpdatedAt.Format("2006-01-02")}
+		rowData := []interface{}{data.Nama, data.Nik, data.NoHandphone, data.Gender, data.Usia, data.Alamat, data.NamaKabupaten, data.NamaKecamatan, data.Jaringan, data.CreatedAt.Format("2006-01-02"), data.UpdatedAt.Format("2006-01-02")}
 		for j, value := range rowData {
 			cell := fmt.Sprintf("%c%d", 'A'+j, i+2)
 			xlsx.SetCellValue(sheetName, cell, value)
