@@ -6,6 +6,7 @@ import (
 	"betpsconnect/pkg/util"
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
 	"time"
 
@@ -599,7 +600,6 @@ func (r *resident) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsBy
 			return []string{}, err
 		}
 
-		// Filter nilai-nilai kosong sebelum mengembalikan hasil
 		var nonEmptyResults []string
 		for _, tps := range result.TPS {
 			if tps != "" {
@@ -610,7 +610,7 @@ func (r *resident) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsBy
 		if len(nonEmptyResults) == 0 {
 			return []string{}, nil
 		}
-
+		fmt.Println("KODOK LAST")
 		return nonEmptyResults, nil
 	}
 

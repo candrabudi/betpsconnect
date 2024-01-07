@@ -129,9 +129,11 @@ func (s *service) residentValidate(ctx context.Context, updatePayload dto.Payloa
 func (s *service) GetTpsBySubDistrict(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error) {
 	resultTps, err := s.residentRepository.GetTpsBySubDistrict(ctx, filter)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
-
+	if len(resultTps) == 0 {
+		return []string{}, nil
+	}
 	return resultTps, nil
 }
 

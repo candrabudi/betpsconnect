@@ -66,8 +66,10 @@ func (s *service) Update(ctx context.Context, ID int, payload dto.PayloadUpdateT
 func (s *service) GetTpsOnValidResident(ctx context.Context, filter dto.FindTpsByDistrict) ([]string, error) {
 	resultTps, err := s.trueResidentRepository.GetTpsOnValidResident(ctx, filter)
 	if err != nil {
-		return nil, err
+		return []string{}, err
 	}
-
+	if len(resultTps) == 0 {
+		return []string{}, nil
+	}
 	return resultTps, nil
 }
