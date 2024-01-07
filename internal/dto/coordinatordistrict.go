@@ -16,7 +16,6 @@ type (
 		Alamat        string `bson:"korcam_address,omitempty" json:"alamat"`
 		NamaKabupaten string `bson:"korcam_city,omitempty" json:"nama_kabupaten"`
 		NamaKecamatan string `bson:"korcam_district,omitempty" json:"nama_kecamatan"`
-		NamaKelurahan string `bson:"korcam_subdistrict,omitempty" json:"nama_kelurahan"`
 		Jaringan      string `bson:"korcam_network,omitempty" json:"jaringan"`
 	}
 

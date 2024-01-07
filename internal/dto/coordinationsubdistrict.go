@@ -16,6 +16,7 @@ type (
 		Alamat        string `bson:"kordes_address,omitempty" json:"alamat"`
 		NamaKabupaten string `bson:"kordes_city,omitempty" json:"nama_kabupaten"`
 		NamaKecamatan string `bson:"kordes_district,omitempty" json:"nama_kecamatan"`
+		NamaKelurahan string `bson:"kordes_subdistrict,omitempty" json:"nama_kelurahan"`
 		Jaringan      string `bson:"kordes_network,omitempty" json:"jaringan"`
 	}
 
