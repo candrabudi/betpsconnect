@@ -18,6 +18,7 @@ type Service interface {
 	Store(ctx context.Context, payload dto.PayloadStoreCoordinatorCity) error
 	Update(ctx context.Context, ID int, payload dto.PayloadStoreCoordinatorCity) error
 	Delete(ctx context.Context, ID int) error
+	Export(ctx context.Context, filter dto.CoordinationCityFilter, userSess any) ([]byte, error)
 }
 
 func NewService(f *factory.Factory) Service {
@@ -50,6 +51,24 @@ func (s *service) GetListCoordinationCity(ctx context.Context, limit, offset int
 			Metadata: dto.MetaData{},
 		}, nil
 	}
+	return resultTpsResidents, nil
+}
+
+func (s *service) Export(ctx context.Context, filter dto.CoordinationCityFilter, userSess any) ([]byte, error) {
+	user, ok := userSess.(model.User)
+	if !ok {
+		return nil, errors.New("invalid user session data")
+	}
+
+	if user.Role == "admin" {
+		filter.KorkabCity = user.Regency
+	}
+
+	resultTpsResidents, err := s.coordinationCityRepository.Export(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
 	return resultTpsResidents, nil
 }
 

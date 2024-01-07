@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"strconv"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,6 +50,26 @@ func (h *handler) GetListCoordinationCity(c *gin.Context) {
 
 	response := util.APIResponse("Success get list of coordination city", http.StatusOK, "success", data)
 	c.JSON(http.StatusOK, response)
+}
+
+func (h *handler) Export(c *gin.Context) {
+	ctx := c.Request.Context()
+	filter := dto.CoordinationCityFilter{
+		Nama:       c.Query("nama"),
+		KorkabCity: c.Query("nama_kabupaten"),
+		Jaringan:   c.Query("jaringan"),
+	}
+	data, err := h.service.Export(ctx, filter, c.Value("user"))
+	if err != nil {
+		response := util.APIResponse("Failed to retrieve export coordination city: "+err.Error(), http.StatusInternalServerError, "failed", nil)
+		c.JSON(http.StatusInternalServerError, response)
+		return
+	}
+
+	fileName := fmt.Sprintf("export_korkab_%s.xlsx", time.Now().Format("20060102150405"))
+	c.Header("Content-Description", "File Transfer")
+	c.Header("Content-Disposition", "attachment; filename="+fileName)
+	c.Data(http.StatusOK, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", data)
 }
 
 func (h *handler) Store(c *gin.Context) {

@@ -7,6 +7,7 @@ import (
 )
 
 func (h *handler) Router(g *gin.RouterGroup) {
+	g.GET("/export", h.Export)
 	g.Use(middleware.Authenticate())
 	g.GET("/list", h.GetListCoordinationCity)
 	g.POST("/store", h.Store)
