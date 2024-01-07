@@ -8,7 +8,7 @@ type CoordinationTps struct {
 	KorTpsNik         string    `bson:"kortps_nik,empty"`
 	KorTpsPhone       string    `bson:"kortps_phone,empty"`
 	KorTpsAge         int       `bson:"kortps_age,empty"`
-	KorTpsGender      int       `bson:"kortps_gender,empty"`
+	KorTpsGender      string    `bson:"kortps_gender,empty"`
 	KorTpsAddress     string    `bson:"kortps_address,empty"`
 	KorTpsDistrict    string    `bson:"kortps_district,empty"`
 	KorTpsCity        string    `bson:"kortps_city,empty"`

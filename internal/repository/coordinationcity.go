@@ -16,7 +16,7 @@ import (
 )
 
 type CoordinationCity interface {
-	GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultAllCoordinatorCity, error)
+	GetAll(ctx context.Context, limit, offset int64, filter dto.CoordinationCityFilter) (dto.ResultAllCoordinatorCity, error)
 	Store(ctx context.Context, newData dto.PayloadStoreCoordinatorCity) error
 	Update(ctx context.Context, ID int, updatedData dto.PayloadStoreCoordinatorCity) error
 }
@@ -31,7 +31,7 @@ func NewCoordinationCityRepository(mongoConn *mongo.Client) CoordinationCity {
 	}
 }
 
-func (cc *coordinationcity) GetAll(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultAllCoordinatorCity, error) {
+func (cc *coordinationcity) GetAll(ctx context.Context, limit, offset int64, filter dto.CoordinationCityFilter) (dto.ResultAllCoordinatorCity, error) {
 
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collectionName := "coordination_city"
@@ -107,13 +107,21 @@ func (cc *coordinationcity) GetAll(ctx context.Context, limit, offset int64, fil
 	return result, nil
 }
 
-func (cc *coordinationcity) GetTotalFilteredCoordinationCount(ctx context.Context, filter dto.ResidentFilter) (int32, error) {
+func (cc *coordinationcity) GetTotalFilteredCoordinationCount(ctx context.Context, filter dto.CoordinationCityFilter) (int32, error) {
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
 	collectionName := "coordination_city"
 
 	collection := cc.MongoConn.Database(dbName).Collection(collectionName)
 
 	filterOptions := bson.M{}
+
+	if filter.NamaKabupaten != "" {
+		filterOptions["kordes_city"] = filter.NamaKabupaten
+	}
+
+	if filter.Jaringan != "" {
+		filterOptions["kordes_network"] = filter.Jaringan
+	}
 
 	if filter.Nama != "" {
 		regexPattern := regexp.QuoteMeta(filter.Nama)

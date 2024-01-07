@@ -12,7 +12,7 @@ type (
 		NoHandphone   string `bson:"kordes_phone,omitempty" json:"telp"`
 		Nik           string `bson:"kordes_nik,omitempty" json:"nik"`
 		Usia          int    `bson:"kordes_age,omitempty" json:"usia"`
-		Gender        int    `bson:"kordes_gender,omitempty" json:"jenis_kelamin"`
+		Gender        string `bson:"kordes_gender,omitempty" json:"jenis_kelamin"`
 		Alamat        string `bson:"kordes_address,omitempty" json:"alamat"`
 		NamaKabupaten string `bson:"kordes_city,omitempty" json:"nama_kabupaten"`
 		NamaKecamatan string `bson:"kordes_district,omitempty" json:"nama_kecamatan"`

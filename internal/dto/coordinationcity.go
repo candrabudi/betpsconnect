@@ -18,7 +18,7 @@ type (
 		Jaringan      string `bson:"korkab_network,omitempty" json:"jaringan"`
 	}
 
-	searchCoordination struct {
+	CoordinationCityFilter struct {
 		Nama          string `json:"nama"`
 		NamaKabupaten string `json:"nama_kabupaten"`
 		Jaringan      string `json:"jaringan"`

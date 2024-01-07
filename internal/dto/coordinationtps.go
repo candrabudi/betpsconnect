@@ -12,7 +12,7 @@ type (
 		NoHandphone   string `bson:"kortps_phone,omitempty" json:"telp"`
 		Nik           string `bson:"kortps_nik,omitempty" json:"nik"`
 		Usia          int    `bson:"kortps_age,omitempty" json:"usia"`
-		Gender        int    `bson:"kortps_gender,omitempty" json:"jenis_kelamin"`
+		Gender        string `bson:"kortps_gender,omitempty" json:"jenis_kelamin"`
 		Alamat        string `bson:"kortps_address,omitempty" json:"alamat"`
 		NamaKabupaten string `bson:"kortps_city,omitempty" json:"nama_kabupaten"`
 		NamaKecamatan string `bson:"kortps_district,omitempty" json:"nama_kecamatan"`
@@ -26,7 +26,7 @@ type (
 		KorTpsNik         string `json:"nik"`
 		KorTpsPhone       string `json:"no_handphone"`
 		KorTpsAge         int    `json:"age"`
-		KorTpsGender      int    `json:"gender"`
+		KorTpsGender      string `json:"gender"`
 		KorTpsAddress     string `json:"address"`
 		KorTpsCity        string `json:"city"`
 		KorTpsDistrict    string `json:"district"`
@@ -40,7 +40,7 @@ type (
 		KorTpsNik         string `json:"nik"`
 		KorTpsPhone       string `json:"no_handphone"`
 		KorTpsAge         int    `json:"age"`
-		KorTpsGender      int    `json:"gender"`
+		KorTpsGender      string `json:"gender"`
 		KorTpsAddress     string `json:"address"`
 		KorTpsCity        string `json:"city"`
 		KorTpsDistrict    string `json:"district"`

@@ -34,9 +34,10 @@ func (h *handler) GetListCoordinationCity(c *gin.Context) {
 		offset = 0
 	}
 
-	filter := dto.ResidentFilter{
+	filter := dto.CoordinationCityFilter{
 		Nama:          c.Query("nama"),
 		NamaKabupaten: c.Query("nama_kabupaten"),
+		Jaringan:      c.Query("jaringan"),
 	}
 
 	data, err := h.service.GetListCoordinationCity(ctx, limit, offset, filter, c.Value("user"))

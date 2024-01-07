@@ -14,7 +14,7 @@ type service struct {
 }
 
 type Service interface {
-	GetListCoordinationCity(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultAllCoordinatorCity, error)
+	GetListCoordinationCity(ctx context.Context, limit, offset int64, filter dto.CoordinationCityFilter, userSess any) (dto.ResultAllCoordinatorCity, error)
 	Store(ctx context.Context, payload dto.PayloadStoreCoordinatorCity) error
 	Update(ctx context.Context, ID int, payload dto.PayloadStoreCoordinatorCity) error
 }
@@ -25,7 +25,7 @@ func NewService(f *factory.Factory) Service {
 	}
 }
 
-func (s *service) GetListCoordinationCity(ctx context.Context, limit, offset int64, filter dto.ResidentFilter, userSess any) (dto.ResultAllCoordinatorCity, error) {
+func (s *service) GetListCoordinationCity(ctx context.Context, limit, offset int64, filter dto.CoordinationCityFilter, userSess any) (dto.ResultAllCoordinatorCity, error) {
 	user, ok := userSess.(model.User)
 	if !ok {
 		return dto.ResultAllCoordinatorCity{}, errors.New("invalid user session data")
