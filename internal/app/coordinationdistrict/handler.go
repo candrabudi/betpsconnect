@@ -140,7 +140,7 @@ func (h *handler) Export(c *gin.Context) {
 		return
 	}
 
-	fileName := fmt.Sprintf("export_korkab_%s.xlsx", time.Now().Format("20060102150405"))
+	fileName := fmt.Sprintf("export_korcam_%s.xlsx", time.Now().Format("20060102150405"))
 	c.Header("Content-Description", "File Transfer")
 	c.Header("Content-Disposition", "attachment; filename="+fileName)
 	c.Data(http.StatusOK, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", data)

@@ -9,6 +9,7 @@ import (
 func (h *handler) Router(g *gin.RouterGroup) {
 	g.Use(middleware.Authenticate())
 	g.GET("/list", h.GetAll)
+	g.GET("/export", h.Export)
 	g.POST("/store", h.Store)
 	g.PUT("/update/:id", h.Update)
 	g.DELETE("/delete/:id", h.Delete)

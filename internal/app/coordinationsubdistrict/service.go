@@ -18,6 +18,7 @@ type Service interface {
 	Store(ctx context.Context, payload dto.PayloadStoreCoordinatorSubdistrict) error
 	Update(ctx context.Context, ID int, payload dto.PayloadUpdateCoordinatorSubdistrict) error
 	Delete(ctx context.Context, ID int) error
+	Export(ctx context.Context, filter dto.CoordinationSubdistrictFilter, userSess any) ([]byte, error)
 }
 
 func NewService(f *factory.Factory) Service {
@@ -51,6 +52,24 @@ func (s *service) GetAll(ctx context.Context, limit, offset int64, filter dto.Co
 		}, nil
 	}
 	return resultTpsResidents, nil
+}
+
+func (s *service) Export(ctx context.Context, filter dto.CoordinationSubdistrictFilter, userSess any) ([]byte, error) {
+	user, ok := userSess.(model.User)
+	if !ok {
+		return nil, errors.New("invalid user session data")
+	}
+
+	if user.Role == "admin" {
+		filter.NamaKabupaten = user.Regency
+	}
+
+	export, err := s.coordinationSubdistrict.Export(ctx, filter)
+	if err != nil {
+		return nil, err
+	}
+
+	return export, nil
 }
 
 func (s *service) Store(ctx context.Context, payload dto.PayloadStoreCoordinatorSubdistrict) error {
