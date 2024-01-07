@@ -267,61 +267,11 @@ func (cc *coordinationcity) Export(ctx context.Context, filter dto.CoordinationC
 	sheetName := "Sheet1"
 	xlsx.NewSheet(sheetName)
 
-	xlsx.SetColWidth(sheetName, "A", "A", 30)
-	xlsx.SetColWidth(sheetName, "B", "B", 30)
-	xlsx.SetColWidth(sheetName, "C", "C", 25)
-	xlsx.SetColWidth(sheetName, "D", "D", 10)
-	xlsx.SetColWidth(sheetName, "E", "E", 35)
-	xlsx.SetColWidth(sheetName, "F", "F", 20)
-	xlsx.SetColWidth(sheetName, "G", "G", 15)
-	xlsx.SetColWidth(sheetName, "H", "H", 20)
-	xlsx.SetColWidth(sheetName, "I", "I", 20)
-
-	style, err := xlsx.NewStyle(`{"alignment":{"horizontal":"center"}}`)
-	if err != nil {
+	if err := setHeaderAndStyle(xlsx, sheetName); err != nil {
 		return nil, err
 	}
 
-	xlsx.SetCellValue(sheetName, "A1", "NAMA")
-	xlsx.SetCellStyle(sheetName, "A1", "A1", style)
-	xlsx.SetCellValue(sheetName, "B1", "NIK")
-	xlsx.SetCellStyle(sheetName, "B1", "B1", style)
-	xlsx.SetCellValue(sheetName, "C1", "NOMOR HANDPHONE")
-	xlsx.SetCellStyle(sheetName, "C1", "C1", style)
-	xlsx.SetCellValue(sheetName, "D1", "UMUR")
-	xlsx.SetCellStyle(sheetName, "D1", "D1", style)
-	xlsx.SetCellValue(sheetName, "E1", "ALAMAT")
-	xlsx.SetCellStyle(sheetName, "E1", "E1", style)
-	xlsx.SetCellValue(sheetName, "F1", "KABUPATEN")
-	xlsx.SetCellStyle(sheetName, "F1", "F1", style)
-	xlsx.SetCellValue(sheetName, "G1", "JARINGAN")
-	xlsx.SetCellStyle(sheetName, "G1", "G1", style)
-	xlsx.SetCellValue(sheetName, "H1", "TANGGAL BUAT")
-	xlsx.SetCellStyle(sheetName, "H1", "H1", style)
-	xlsx.SetCellValue(sheetName, "I1", "TANGGAL UPDATE")
-	xlsx.SetCellStyle(sheetName, "I1", "I1", style)
-
-	for i, data := range dataAllResident {
-		xlsx.SetCellValue(sheetName, fmt.Sprintf("A%d", i+2), data.Nama)
-		xlsx.SetCellValue(sheetName, fmt.Sprintf("B%d", i+2), data.Nik)
-		xlsx.SetCellValue(sheetName, fmt.Sprintf("C%d", i+2), data.NoHandphone)
-		xlsx.SetCellStyle(sheetName, fmt.Sprintf("C%d", i+2), fmt.Sprintf("C%d", i+2), style)
-		xlsx.SetCellValue(sheetName, fmt.Sprintf("D%d", i+2), data.Usia)
-		xlsx.SetCellStyle(sheetName, fmt.Sprintf("D%d", i+2), fmt.Sprintf("D%d", i+2), style)
-		xlsx.SetCellValue(sheetName, fmt.Sprintf("E%d", i+2), data.Alamat)
-		xlsx.SetCellValue(sheetName, fmt.Sprintf("F%d", i+2), data.NamaKabupaten)
-		xlsx.SetCellStyle(sheetName, fmt.Sprintf("F%d", i+2), fmt.Sprintf("F%d", i+2), style)
-		xlsx.SetCellValue(sheetName, fmt.Sprintf("G%d", i+2), data.Jaringan)
-		xlsx.SetCellStyle(sheetName, fmt.Sprintf("G%d", i+2), fmt.Sprintf("G%d", i+2), style)
-
-		createdAtFormatted := data.CreatedAt.Format("2006-01-02")
-		xlsx.SetCellValue(sheetName, fmt.Sprintf("H%d", i+2), createdAtFormatted)
-		xlsx.SetCellStyle(sheetName, fmt.Sprintf("H%d", i+2), fmt.Sprintf("H%d", i+2), style)
-
-		updatedAtFormatted := data.UpdatedAt.Format("2006-01-02")
-		xlsx.SetCellValue(sheetName, fmt.Sprintf("I%d", i+2), updatedAtFormatted)
-		xlsx.SetCellStyle(sheetName, fmt.Sprintf("I%d", i+2), fmt.Sprintf("I%d", i+2), style)
-	}
+	setDataRows(xlsx, sheetName, dataAllResident)
 
 	fileBytes, err := xlsx.WriteToBuffer()
 	if err != nil {
@@ -329,6 +279,37 @@ func (cc *coordinationcity) Export(ctx context.Context, filter dto.CoordinationC
 	}
 
 	return fileBytes.Bytes(), nil
+}
+
+func setHeaderAndStyle(xlsx *excelize.File, sheetName string) error {
+	headers := []string{"NAMA", "NIK", "NOMOR HANDPHONE", "UMUR", "ALAMAT", "KABUPATEN", "JARINGAN", "TANGGAL BUAT", "TANGGAL UPDATE"}
+	widths := []float64{30, 30, 25, 10, 35, 20, 15, 20, 20}
+
+	style, err := xlsx.NewStyle(`{"alignment":{"horizontal":"center"}}`)
+	if err != nil {
+		return err
+	}
+
+	for i, header := range headers {
+		cell := fmt.Sprintf("%c%d", 'A'+i, 1)
+		xlsx.SetCellValue(sheetName, cell, header)
+		xlsx.SetCellStyle(sheetName, cell, cell, style)
+		xlsx.SetColWidth(sheetName, cell[:1], cell[:1], widths[i])
+	}
+	return nil
+}
+
+func setDataRows(xlsx *excelize.File, sheetName string, dataAllResident []dto.ExportCoordinatorCity) {
+	style, _ := xlsx.NewStyle(`{"alignment":{"horizontal":"center"}}`)
+
+	for i, data := range dataAllResident {
+		rowData := []interface{}{data.Nama, data.Nik, data.NoHandphone, data.Usia, data.Alamat, data.NamaKabupaten, data.Jaringan, data.CreatedAt.Format("2006-01-02"), data.UpdatedAt.Format("2006-01-02")}
+		for j, value := range rowData {
+			cell := fmt.Sprintf("%c%d", 'A'+j, i+2)
+			xlsx.SetCellValue(sheetName, cell, value)
+			xlsx.SetCellStyle(sheetName, cell, cell, style)
+		}
+	}
 }
 
 func (cc *coordinationcity) getLastData(ctx context.Context, collection *mongo.Collection) (model.Resident, error) {
