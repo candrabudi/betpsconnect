@@ -6,9 +6,11 @@ import (
 	"betpsconnect/pkg/util"
 	"context"
 	"errors"
+	"fmt"
 	"regexp"
 	"time"
 
+	"github.com/360EntSecGroup-Skylar/excelize"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -20,6 +22,7 @@ type CoordinationTps interface {
 	GetAll(ctx context.Context, limit, offset int64, filter dto.CoordinationTpsFilter) (dto.ResultAllCoordinatorTps, error)
 	Update(ctx context.Context, ID int, updatedData dto.PayloadUpdateCoordinatorTps) error
 	Delete(ctx context.Context, ID int) error
+	Export(ctx context.Context, filter dto.CoordinationTpsFilter) ([]byte, error)
 }
 
 type coordinationtps struct {
@@ -271,6 +274,104 @@ func (cs *coordinationtps) Delete(ctx context.Context, ID int) error {
 	}
 
 	return nil
+}
+
+func (ct *coordinationtps) Export(ctx context.Context, filter dto.CoordinationTpsFilter) ([]byte, error) {
+	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+	collectionName := "coordination_tps"
+
+	collection := ct.MongoConn.Database(dbName).Collection(collectionName)
+	pipeline := make([]bson.M, 0)
+
+	matchStage := bson.M{}
+
+	if filter.NamaKabupaten != "" {
+		matchStage["kortps_city"] = filter.NamaKabupaten
+	}
+
+	if filter.NamaKecamatan != "" {
+		matchStage["kortps_district"] = filter.NamaKecamatan
+	}
+
+	if filter.NamaKelurahan != "" {
+		matchStage["kortps_subdistrict"] = filter.NamaKelurahan
+	}
+
+	if filter.Tps != "" {
+		matchStage["kortps_tps"] = filter.Tps
+	}
+
+	if filter.Jaringan != "" {
+		matchStage["kortps_network"] = filter.Jaringan
+	}
+
+	if filter.Nama != "" {
+		regexPattern := regexp.QuoteMeta(filter.Nama)
+		matchStage["kortps_name"] = primitive.Regex{Pattern: regexPattern, Options: "i"}
+	}
+
+	if len(matchStage) > 0 {
+		pipeline = append(pipeline, bson.M{"$match": matchStage})
+	}
+
+	cursor, err := collection.Aggregate(ctx, pipeline)
+	if err != nil {
+		return nil, err
+	}
+	defer cursor.Close(ctx)
+
+	var dataAllResident []dto.ExportCoordinatorTps
+	if err = cursor.All(ctx, &dataAllResident); err != nil {
+		return nil, err
+	}
+
+	xlsx := excelize.NewFile()
+	sheetName := "Sheet1"
+	xlsx.NewSheet(sheetName)
+
+	if err := ct.setHeaderAndStyle(xlsx, sheetName); err != nil {
+		return nil, err
+	}
+
+	ct.setDataRows(xlsx, sheetName, dataAllResident)
+
+	fileBytes, err := xlsx.WriteToBuffer()
+	if err != nil {
+		return nil, err
+	}
+
+	return fileBytes.Bytes(), nil
+}
+
+func (ct *coordinationtps) setHeaderAndStyle(xlsx *excelize.File, sheetName string) error {
+	headers := []string{"NAMA", "NIK", "NOMOR HANDPHONE", "JK", "UMUR", "ALAMAT", "KABUPATEN", "KECAMATAN", "KELURAHAN", "TPS", "JARINGAN", "TANGGAL BUAT", "TANGGAL UPDATE"}
+	widths := []float64{30, 30, 25, 10, 10, 35, 20, 20, 20, 15, 15, 20, 20}
+
+	style, err := xlsx.NewStyle(`{"alignment":{"horizontal":"center"}}`)
+	if err != nil {
+		return err
+	}
+
+	for i, header := range headers {
+		cell := fmt.Sprintf("%c%d", 'A'+i, 1)
+		xlsx.SetCellValue(sheetName, cell, header)
+		xlsx.SetCellStyle(sheetName, cell, cell, style)
+		xlsx.SetColWidth(sheetName, cell[:1], cell[:1], widths[i])
+	}
+	return nil
+}
+
+func (ct *coordinationtps) setDataRows(xlsx *excelize.File, sheetName string, dataAllResident []dto.ExportCoordinatorTps) {
+	style, _ := xlsx.NewStyle(`{"alignment":{"horizontal":"center"}}`)
+
+	for i, data := range dataAllResident {
+		rowData := []interface{}{data.Nama, data.Nik, data.NoHandphone, data.Gender, data.Usia, data.Alamat, data.NamaKabupaten, data.NamaKecamatan, data.NamaKelurahan, data.Tps, data.Jaringan, data.CreatedAt.Format("2006-01-02"), data.UpdatedAt.Format("2006-01-02")}
+		for j, value := range rowData {
+			cell := fmt.Sprintf("%c%d", 'A'+j, i+2)
+			xlsx.SetCellValue(sheetName, cell, value)
+			xlsx.SetCellStyle(sheetName, cell, cell, style)
+		}
+	}
 }
 
 func (cs *coordinationtps) getLastData(ctx context.Context, collection *mongo.Collection) (model.CoordinationTps, error) {
