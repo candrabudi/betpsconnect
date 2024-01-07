@@ -1,5 +1,7 @@
 package dto
 
+import "time"
+
 type (
 	ResultAllCoordinatorDistrict struct {
 		Items    []FindCoordinatorDistrict `json:"items"`
@@ -17,6 +19,21 @@ type (
 		NamaKabupaten string `bson:"korcam_city,omitempty" json:"nama_kabupaten"`
 		NamaKecamatan string `bson:"korcam_district,omitempty" json:"nama_kecamatan"`
 		Jaringan      string `bson:"korcam_network,omitempty" json:"jaringan"`
+	}
+
+	ExportCoordinatorDistrict struct {
+		ID            int       `bson:"id,omitempty" json:"id"`
+		Nama          string    `bson:"korcam_name,omitempty" json:"nama"`
+		NoHandphone   string    `bson:"korcam_phone,omitempty" json:"telp"`
+		Nik           string    `bson:"korcam_nik,omitempty" json:"nik"`
+		Usia          int       `bson:"korcam_age,omitempty" json:"usia"`
+		Gender        string    `bson:"korcam_gender,omitempty" json:"jenis_kelamin"`
+		Alamat        string    `bson:"korcam_address,omitempty" json:"alamat"`
+		NamaKabupaten string    `bson:"korcam_city,omitempty" json:"nama_kabupaten"`
+		NamaKecamatan string    `bson:"korcam_district,omitempty" json:"nama_kecamatan"`
+		Jaringan      string    `bson:"korcam_network,omitempty" json:"jaringan"`
+		CreatedAt     time.Time `bson:"created_at,omitempty" json:"created_at"`
+		UpdatedAt     time.Time `bson:"updated_at,omitempty" json:"updated_at"`
 	}
 
 	PayloadStoreCoordinatorDistrict struct {
