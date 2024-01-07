@@ -8,24 +8,30 @@ type (
 
 	FindCoordinatorCity struct {
 		ID            int    `bson:"id,omitempty" json:"id"`
-		Nama          string `bson:"korkab_name,omitempty" json:"name"`
-		NoHandphone   string `bson:"korkab_phone,omitempty" json:"no_handphone"`
+		Nama          string `bson:"korkab_name,omitempty" json:"nama"`
+		NoHandphone   string `bson:"korkab_phone,omitempty" json:"telp"`
 		Nik           string `bson:"korkab_nik,omitempty" json:"nik"`
-		Usia          int    `bson:"korkab_age,omitempty" json:"age"`
-		Alamat        string `bson:"korkab_address,omitempty" json:"address"`
-		NamaKabupaten string `bson:"korkab_city,omitempty" json:"city"`
+		Usia          int    `bson:"korkab_age,omitempty" json:"usia"`
+		Gender        string `bson:"korkab_gender,omitempty" json:"jenis_kelamin"`
+		Alamat        string `bson:"korkab_address,omitempty" json:"alamat"`
+		NamaKabupaten string `bson:"korkab_city,omitempty" json:"nama_kabupaten"`
+		Jaringan      string `bson:"korkab_network,omitempty" json:"jaringan"`
 	}
 
 	searchCoordination struct {
-		Nama string `json:"nama"`
+		Nama          string `json:"nama"`
+		NamaKabupaten string `json:"nama_kabupaten"`
+		Jaringan      string `json:"jaringan"`
 	}
 
 	PayloadStoreCoordinatorCity struct {
-		KorkabName    string `json:"korkab_name"`
-		KorkabNik     string `json:"korkab_nik"`
-		KorkabPhone   string `json:"korkab_phone"`
-		KorkabAge     int    `json:"korkab_age"`
-		KorkabAddress string `json:"korkab_address"`
-		KorkabCity    string `json:"korkab_city"`
+		KorkabName    string `json:"full_name"`
+		KorkabNik     string `json:"nik"`
+		KorkabPhone   string `json:"no_handphone"`
+		KorkabAge     int    `json:"age"`
+		KorkabGender  string `json:"Gender"`
+		KorkabAddress string `json:"address"`
+		KorkabCity    string `json:"city"`
+		KorkabNetwork string `json:"jaringan"`
 	}
 )

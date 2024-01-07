@@ -8,6 +8,7 @@ type CoordinationDistrict struct {
 	KorcamNik      string    `bson:"korcam_nik,empty"`
 	KorcamPhone    string    `bson:"korcam_phone,empty"`
 	KorcamAge      int       `bson:"korcam_age,empty"`
+	KorcamGender   string    `bson:"korcam_gender,empty"`
 	KorcamAddress  string    `bson:"korcam_address,empty"`
 	KorcamDistrict string    `bson:"korcam_district,empty"`
 	KorcamCity     string    `bson:"korcam_city,empty"`

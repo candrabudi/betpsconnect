@@ -8,6 +8,7 @@ type CoordinationSubdistrict struct {
 	KordesNik         string    `bson:"kordes_nik,empty"`
 	KordesPhone       string    `bson:"kordes_phone,empty"`
 	KordesAge         int       `bson:"kordes_age,empty"`
+	KordesGender      string    `bson:"kordes_gender,empty"`
 	KordesAddress     string    `bson:"kordes_address,empty"`
 	KordesDistrict    string    `bson:"kordes_district,empty"`
 	KordesCity        string    `bson:"kordes_city,empty"`

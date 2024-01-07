@@ -8,36 +8,39 @@ type (
 
 	FindCoordinatorDistrict struct {
 		ID            int    `bson:"id,omitempty" json:"id"`
-		Nama          string `bson:"korcam_name,omitempty" json:"name"`
-		NoHandphone   string `bson:"korcam_phone,omitempty" json:"no_handphone"`
+		Nama          string `bson:"korcam_name,omitempty" json:"nama"`
+		NoHandphone   string `bson:"korcam_phone,omitempty" json:"telp"`
 		Nik           string `bson:"korcam_nik,omitempty" json:"nik"`
-		Usia          int    `bson:"korcam_age,omitempty" json:"age"`
-		Alamat        string `bson:"korcam_address,omitempty" json:"address"`
-		NamaKabupaten string `bson:"korcam_city,omitempty" json:"city"`
-		NamaKecamatan string `bson:"korcam_district,omitempty" json:"district"`
-		Jaringan      string `bson:"korcam_network,omitempty" json:"network"`
+		Usia          int    `bson:"korcam_age,omitempty" json:"usia"`
+		Alamat        string `bson:"korcam_address,omitempty" json:"alamat"`
+		NamaKabupaten string `bson:"korcam_city,omitempty" json:"nama_kabupaten"`
+		NamaKecamatan string `bson:"korcam_district,omitempty" json:"nama_kecamatan"`
+		NamaKelurahan string `bson:"korcam_subdistrict,omitempty" json:"nama_kelurahan"`
+		Jaringan      string `bson:"korcam_network,omitempty" json:"jaringan"`
 	}
 
 	PayloadStoreCoordinatorDistrict struct {
-		KorcamName     string `json:"korcam_name"`
-		KorcamNik      string `json:"korcam_nik"`
-		KorcamPhone    string `json:"korcam_phone"`
-		KorcamAge      int    `json:"korcam_age"`
-		KorcamAddress  string `json:"korcam_address"`
-		KorcamCity     string `json:"korcam_city"`
-		KorcamDistrict string `json:"korcam_district"`
-		KorcamNetwork  string `json:"korcam_network"`
+		KorcamName     string `json:"full_name"`
+		KorcamNik      string `json:"nik"`
+		KorcamPhone    string `json:"no_handphone"`
+		KorcamAge      int    `json:"age"`
+		KorcamGender   string `json:"gender"`
+		KorcamAddress  string `json:"address"`
+		KorcamCity     string `json:"city"`
+		KorcamDistrict string `json:"district"`
+		KorcamNetwork  string `json:"jaringan"`
 	}
 
 	PayloadUpdateCoordinatorDistrict struct {
-		KorcamName     string `json:"korcam_name"`
-		KorcamNik      string `json:"korcam_nik"`
-		KorcamPhone    string `json:"korcam_phone"`
-		KorcamAge      int    `json:"korcam_age"`
-		KorcamAddress  string `json:"korcam_address"`
-		KorcamCity     string `json:"korcam_city"`
-		KorcamDistrict string `json:"korcam_district"`
-		KorcamNetwork  string `json:"korcam_network"`
+		KorcamName     string `json:"full_name"`
+		KorcamNik      string `json:"nik"`
+		KorcamPhone    string `json:"no_handphone"`
+		KorcamAge      int    `json:"age"`
+		KorcamGender   string `json:"gender"`
+		KorcamAddress  string `json:"address"`
+		KorcamCity     string `json:"city"`
+		KorcamDistrict string `json:"district"`
+		KorcamNetwork  string `json:"jaringan"`
 	}
 
 	CoordinationDistrictFilter struct {

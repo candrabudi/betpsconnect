@@ -62,8 +62,10 @@ func (cc *coordinationcity) GetAll(ctx context.Context, limit, offset int64, fil
 			"korkab_nik":     1,
 			"korkab_phone":   1,
 			"korkab_age":     1,
+			"korkab_gender":  1,
 			"korkab_address": 1,
 			"korkab_city":    1,
+			"korkab_network": 1,
 		},
 	}
 
@@ -165,8 +167,10 @@ func (cc *coordinationcity) Store(ctx context.Context, newData dto.PayloadStoreC
 		KorkabNik:     newData.KorkabNik,
 		KorkabPhone:   newData.KorkabPhone,
 		KorkabAge:     newData.KorkabAge,
+		KorkabGender:  newData.KorkabGender,
 		KorkabAddress: newData.KorkabAddress,
 		KorkabCity:    newData.KorkabCity,
+		KorkabNetwork: newData.KorkabNetwork,
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
 	}
@@ -192,8 +196,10 @@ func (cc *coordinationcity) Update(ctx context.Context, ID int, updatedData dto.
 			"korkab_nik":     updatedData.KorkabNik,
 			"korkab_phone":   updatedData.KorkabPhone,
 			"korkab_age":     updatedData.KorkabAge,
+			"korkab_gender":  updatedData.KorkabGender,
 			"korkab_address": updatedData.KorkabAddress,
 			"korkab_city":    updatedData.KorkabCity,
+			"korkab_network": updatedData.KorkabNetwork,
 			"updated_at":     time.Now(),
 		},
 	}

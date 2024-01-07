@@ -8,42 +8,45 @@ type (
 
 	FindCoordinatorTps struct {
 		ID            int    `bson:"id,omitempty" json:"id"`
-		Nama          string `bson:"kortps_name,omitempty" json:"name"`
-		NoHandphone   string `bson:"kortps_phone,omitempty" json:"no_handphone"`
+		Nama          string `bson:"kortps_name,omitempty" json:"nama"`
+		NoHandphone   string `bson:"kortps_phone,omitempty" json:"telp"`
 		Nik           string `bson:"kortps_nik,omitempty" json:"nik"`
-		Usia          int    `bson:"kortps_age,omitempty" json:"age"`
-		Alamat        string `bson:"kortps_address,omitempty" json:"address"`
-		NamaKabupaten string `bson:"kortps_city,omitempty" json:"city"`
-		NamaKecamatan string `bson:"kortps_district,omitempty" json:"district"`
-		NamaKelurahan string `bson:"kortps_subdistrict,omitempty" json:"subdistrict"`
+		Usia          int    `bson:"kortps_age,omitempty" json:"usia"`
+		Gender        int    `bson:"kortps_gender,omitempty" json:"jenis_kelamin"`
+		Alamat        string `bson:"kortps_address,omitempty" json:"alamat"`
+		NamaKabupaten string `bson:"kortps_city,omitempty" json:"nama_kabupaten"`
+		NamaKecamatan string `bson:"kortps_district,omitempty" json:"nama_kecamatan"`
+		NamaKelurahan string `bson:"kortps_subdistrict,omitempty" json:"nama_kelurahan"`
 		Tps           string `bson:"kortps_tps,omitempty" json:"tps"`
-		Jaringan      string `bson:"kortps_network,omitempty" json:"network"`
+		Jaringan      string `bson:"kortps_network,omitempty" json:"jaringan"`
 	}
 
 	PayloadStoreCoordinatorTps struct {
-		KorTpsName        string `json:"kortps_name"`
-		KorTpsNik         string `json:"kortps_nik"`
-		KorTpsPhone       string `json:"kortps_phone"`
-		KorTpsAge         int    `json:"kortps_age"`
-		KorTpsAddress     string `json:"kortps_address"`
-		KorTpsCity        string `json:"kortps_city"`
-		KorTpsDistrict    string `json:"kortps_district"`
-		KorTpsSubdistrict string `json:"kortps_subdistrict"`
-		KorTpsTps         string `json:"kortps_tps"`
-		KorTpsNetwork     string `json:"kortps_network"`
+		KorTpsName        string `json:"full_name"`
+		KorTpsNik         string `json:"nik"`
+		KorTpsPhone       string `json:"no_handphone"`
+		KorTpsAge         int    `json:"age"`
+		KorTpsGender      int    `json:"gender"`
+		KorTpsAddress     string `json:"address"`
+		KorTpsCity        string `json:"city"`
+		KorTpsDistrict    string `json:"district"`
+		KorTpsSubdistrict string `json:"subdistrict"`
+		KorTpsTps         string `json:"tps"`
+		KorTpsNetwork     string `json:"jaringan"`
 	}
 
 	PayloadUpdateCoordinatorTps struct {
-		KorTpsName        string `json:"kortps_name"`
-		KorTpsNik         string `json:"kortps_nik"`
-		KorTpsPhone       string `json:"kortps_phone"`
-		KorTpsAge         int    `json:"kortps_age"`
-		KorTpsAddress     string `json:"kortps_address"`
-		KorTpsCity        string `json:"kortps_city"`
-		KorTpsDistrict    string `json:"kortps_district"`
-		KorTpsSubdistrict string `json:"kortps_subdistrict"`
-		KorTpsTps         string `json:"kortps_tps"`
-		KorTpsNetwork     string `json:"kortps_network"`
+		KorTpsName        string `json:"full_name"`
+		KorTpsNik         string `json:"nik"`
+		KorTpsPhone       string `json:"no_handphone"`
+		KorTpsAge         int    `json:"age"`
+		KorTpsGender      int    `json:"gender"`
+		KorTpsAddress     string `json:"address"`
+		KorTpsCity        string `json:"city"`
+		KorTpsDistrict    string `json:"district"`
+		KorTpsSubdistrict string `json:"subdistrict"`
+		KorTpsTps         string `json:"tps"`
+		KorTpsNetwork     string `json:"jaringan"`
 	}
 
 	CoordinationTpsFilter struct {
