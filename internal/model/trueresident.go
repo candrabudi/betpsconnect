@@ -9,7 +9,7 @@ type TrueResident struct {
 	NoHandphone string    `bson:"no_handphone,empty"`
 	Age         int       `bson:"age,omitempty"`
 	Gender      string    `bson:"gender,omitempty"`
-	Address     string    `bson:"address,omitempty"`
+	Address     string    `bson:"address,empty"`
 	SubDistrict string    `bson:"subdistrict, omitempty"`
 	District    string    `bson:"district, omitempty"`
 	City        string    `bson:"city, omitempty"`
