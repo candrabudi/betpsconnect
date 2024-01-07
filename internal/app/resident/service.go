@@ -7,6 +7,8 @@ import (
 	"betpsconnect/internal/repository"
 	"context"
 	"errors"
+	"fmt"
+	"strconv"
 
 	"go.mongodb.org/mongo-driver/mongo"
 )
@@ -44,6 +46,15 @@ func (s *service) GetListResident(ctx context.Context, limit, offset int64, filt
 
 	if user.Role == "admin" {
 		filter.NamaKabupaten = user.Regency
+	}
+
+	if filter.TPS != "" {
+		num, err := strconv.Atoi(filter.TPS)
+		if err == nil {
+			filter.TPS = fmt.Sprintf("%03d", num)
+		} else {
+			filter.TPS = filter.TPS
+		}
 	}
 
 	resultTpsResidents, err := s.residentRepository.GetResidentTps(ctx, limit, offset, filter)
