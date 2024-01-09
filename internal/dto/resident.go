@@ -24,6 +24,7 @@ type (
 		JenisKelamin   string `bson:"jenis_kelamin,omitempty" json:"jenis_kelamin"`
 		NamaKabupaten  string `bson:"nama_kabupaten,omitempty" json:"nama_kabupaten"`
 		NamaKecamatan  string `bson:"nama_kecamatan,omitempty" json:"nama_kecamatan"`
+		NamaKelurahan  string `bson:"nama_kelurahan,omitempty" json:"nama_kelurahan"`
 		Nik            string `bson:"nik,omitempty" json:"nik"`
 		TanggalLahir   string `bson:"tanggal_lahir,omitempty" json:"tanggal_lahir"`
 		Usia           int    `bson:"usia,omitempty" json:"usia"`

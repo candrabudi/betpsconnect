@@ -80,6 +80,8 @@ func (r *resident) GetResidentTps(ctx context.Context, limit, offset int64, filt
 			"nama":             1,
 			"jenis_kelamin":    1,
 			"nama_kecamatan":   1,
+			"nama_kelurahan":   1,
+			"nama_kabupaten":   1,
 			"tanggal_lahir":    1,
 			"tps":              1,
 			"nik":              1,
