@@ -190,6 +190,8 @@ func (r *resident) GetListValidate(ctx context.Context, limit, offset int64, fil
 			"nama":             1,
 			"jenis_kelamin":    1,
 			"nama_kecamatan":   1,
+			"nama_kelurahan":   1,
+			"nama_kabupaten":   1,
 			"tanggal_lahir":    1,
 			"tps":              1,
 			"nik":              1,
@@ -221,6 +223,7 @@ func (r *resident) GetListValidate(ctx context.Context, limit, offset int64, fil
 		}, err
 	}
 	defer cursor.Close(ctx)
+
 	var dataAllResident []dto.FindValidateResidents
 	if err = cursor.All(ctx, &dataAllResident); err != nil {
 		return dto.ResultValidateResidents{
@@ -253,6 +256,112 @@ func (r *resident) GetListValidate(ctx context.Context, limit, offset int64, fil
 
 	return result, nil
 }
+// func (r *resident) GetListValidate(ctx context.Context, limit, offset int64, filter dto.ResidentFilter) (dto.ResultValidateResidents, error) {
+// 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
+// 	collectionName := "residents"
+
+// 	collection := r.MongoConn.Database(dbName).Collection(collectionName)
+
+// 	pipeline := []bson.M{}
+
+// 	matchStage := bson.M{}
+
+// 	if filter.NamaKabupaten != "" {
+// 		matchStage["nama_kabupaten"] = filter.NamaKabupaten
+// 	}
+
+// 	if filter.NamaKecamatan != "" {
+// 		matchStage["nama_kecamatan"] = filter.NamaKecamatan
+// 	}
+
+// 	if filter.NamaKelurahan != "" {
+// 		matchStage["nama_kelurahan"] = filter.NamaKelurahan
+// 	}
+
+// 	if filter.TPS != "" {
+// 		matchStage["tps"] = filter.TPS
+// 	}
+
+// 	if filter.Nama != "" {
+// 		regexPattern := regexp.QuoteMeta(filter.Nama)
+// 		matchStage["$or"] = []bson.M{{"nama": primitive.Regex{Pattern: regexPattern, Options: "i"}}}
+// 	}
+// 	matchStage["is_deleted"] = 0
+
+// 	if len(matchStage) > 0 {
+// 		pipeline = append(pipeline, bson.M{"$match": matchStage})
+// 	}
+
+// 	projectStage := bson.M{
+// 		"$project": bson.M{
+// 			"_id":              1,
+// 			"id":               1,
+// 			"nama":             1,
+// 			"jenis_kelamin":    1,
+// 			"nama_kecamatan":   1,
+// 			"tanggal_lahir":    1,
+// 			"tps":              1,
+// 			"nik":              1,
+// 			"nkk":              1,
+// 			"status":           1,
+// 			"is_verification":  1,
+// 			"status_tps_label": 1,
+// 			"tempat_lahir":     1,
+// 			"telp":             1,
+// 			"no_ktp":           1,
+// 			"difabel":          1,
+// 			"kawin":            1,
+// 			"rt":               1,
+// 			"rw":               1,
+// 			"alamat":           1,
+// 		},
+// 	}
+
+// 	pipeline = append(pipeline, projectStage)
+
+// 	pipeline = append(pipeline, bson.M{"$skip": offset})
+// 	pipeline = append(pipeline, bson.M{"$limit": limit})
+
+// 	cursor, err := collection.Aggregate(ctx, pipeline)
+// 	if err != nil {
+// 		return dto.ResultValidateResidents{
+// 			Items:    []dto.FindValidateResidents{},
+// 			Metadata: dto.MetaData{},
+// 		}, err
+// 	}
+// 	defer cursor.Close(ctx)
+// 	var dataAllResident []dto.FindValidateResidents
+// 	if err = cursor.All(ctx, &dataAllResident); err != nil {
+// 		return dto.ResultValidateResidents{
+// 			Items:    []dto.FindValidateResidents{},
+// 			Metadata: dto.MetaData{},
+// 		}, err
+// 	}
+
+// 	totalResults, err := r.GetTotalFilteredResidentCount(ctx, filter)
+// 	if err != nil {
+// 		return dto.ResultValidateResidents{
+// 			Items:    []dto.FindValidateResidents{},
+// 			Metadata: dto.MetaData{},
+// 		}, err
+// 	}
+
+// 	result := dto.ResultValidateResidents{
+// 		Items: dataAllResident,
+// 		Metadata: dto.MetaData{
+// 			TotalResults: int(totalResults),
+// 			Limit:        int(limit),
+// 			Offset:       int(offset),
+// 			Count:        len(dataAllResident),
+// 		},
+// 	}
+
+// 	if totalResults == 0 {
+// 		result.Items = []dto.FindValidateResidents{}
+// 	}
+
+// 	return result, nil
+// }
 
 func (r *resident) GetTotalFilteredResidentCount(ctx context.Context, filter dto.ResidentFilter) (int32, error) {
 	dbName := util.GetEnv("MONGO_DB_NAME", "tpsconnect_dev")
